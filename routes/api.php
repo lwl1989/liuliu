@@ -11,9 +11,9 @@
 |
 */
 
-//Route::middleware('auth:api')->get('/user', function (Request $request) {
-//    return $request->user();
-//});
+Route::group(['middleware' => ['format']], function () {
+    Route::get('wx/login','Auth\WxController@login');
+});
 //
 //
 //Route::get('/abc', function (Request $request){
