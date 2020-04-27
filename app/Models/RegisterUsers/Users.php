@@ -52,28 +52,28 @@ class Users extends User implements ModelExtInterface
                 /** @var Model $user */
                 $user = $this->take(1)->get($columns)->first();
 
-                //從別的模型查數據  設置到這個模型裏面
-                if ($user != null) {
-                    $profile = UserProfile::query()
-                        ->where('user_id', '=', $user->getAttributeValue('id'))
-                        ->first();
-
-                    if (!empty($profile)) {
-                        $profile = $profile->toArray();
-                        $profile['profile_id'] = $profile['id'];
-                        unset($profile['id']);
-                        foreach ($profile as $key => $value) {
-                            $user->setAttribute($key, $value);
-                        }
-                    }
-
-                    $third = UserThird::query()->where('user_id', '=', $user->getAttributeValue('id'))->take(2)
-                        ->get();
-                    if (!empty($third)) {
-                        $third = $third->toArray();
-                        $user->setAttribute('third', $third);
-                    }
-                }
+//                //從別的模型查數據  設置到這個模型裏面
+//                if ($user != null) {
+//                    $profile = UserProfile::query()
+//                        ->where('user_id', '=', $user->getAttributeValue('id'))
+//                        ->first();
+//
+//                    if (!empty($profile)) {
+//                        $profile = $profile->toArray();
+//                        $profile['profile_id'] = $profile['id'];
+//                        unset($profile['id']);
+//                        foreach ($profile as $key => $value) {
+//                            $user->setAttribute($key, $value);
+//                        }
+//                    }
+//
+//                    $third = UserThird::query()->where('user_id', '=', $user->getAttributeValue('id'))->take(2)
+//                        ->get();
+//                    if (!empty($third)) {
+//                        $third = $third->toArray();
+//                        $user->setAttribute('third', $third);
+//                    }
+//                }
                 return $user;
             }
 
