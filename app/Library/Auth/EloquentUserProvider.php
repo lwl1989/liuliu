@@ -54,6 +54,7 @@ class EloquentUserProvider extends \Illuminate\Auth\EloquentUserProvider
             $model = $model->newQuery()
                 ->where($model->getAuthIdentifierName(), $uid)
                 ->first();
+            var_dump($model);
             if (empty($model)) {
                 return null;
             }
