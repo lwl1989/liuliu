@@ -50,7 +50,7 @@ class EloquentUserProvider extends \Illuminate\Auth\EloquentUserProvider
                 $uid = $this->_validateToken($token);
                 var_dump($uid);
                 $model = $this->createModel();
-
+                var_dump($model);
                 $model = $model->newQuery()
                     ->where($model->getAuthIdentifierName(), $uid)
                     ->first();
