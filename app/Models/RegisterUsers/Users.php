@@ -23,64 +23,64 @@ class Users extends User implements ModelExtInterface
     use Notifiable, ExtensionModelTrait;
 
 
-    public function newQuery()
-    {
-        $query = $this->newBaseQueryBuilder();
-        $builder = new class($query) extends Builder
-        {
-
-            /**
-             * Create a new Eloquent query builder instance.
-             *
-             * @param  \Illuminate\Database\Query\Builder $query
-             * @return void
-             */
-            public function __construct(QueryBuilder $query)
-            {
-
-                parent::__construct($query);
-            }
-
-            /**
-             * Execute the query and get the first result.
-             *
-             * @param  array $columns
-             * @return \Illuminate\Database\Eloquent\Model|object|static|null
-             */
-            public function first($columns = ['*'])
-            {
-                /** @var Model $user */
-                $user = $this->take(1)->get($columns)->first();
-
-//                //從別的模型查數據  設置到這個模型裏面
-//                if ($user != null) {
-//                    $profile = UserProfile::query()
-//                        ->where('user_id', '=', $user->getAttributeValue('id'))
-//                        ->first();
+//    public function newQuery()
+//    {
+//        $query = $this->newBaseQueryBuilder();
+//        $builder = new class($query) extends Builder
+//        {
 //
-//                    if (!empty($profile)) {
-//                        $profile = $profile->toArray();
-//                        $profile['profile_id'] = $profile['id'];
-//                        unset($profile['id']);
-//                        foreach ($profile as $key => $value) {
-//                            $user->setAttribute($key, $value);
-//                        }
-//                    }
+//            /**
+//             * Create a new Eloquent query builder instance.
+//             *
+//             * @param  \Illuminate\Database\Query\Builder $query
+//             * @return void
+//             */
+//            public function __construct(QueryBuilder $query)
+//            {
 //
-//                    $third = UserThird::query()->where('user_id', '=', $user->getAttributeValue('id'))->take(2)
-//                        ->get();
-//                    if (!empty($third)) {
-//                        $third = $third->toArray();
-//                        $user->setAttribute('third', $third);
-//                    }
-//                }
-                return $user;
-            }
-
-        };
-        $builder->setModel($this);
-        return $builder;
-    }
+//                parent::__construct($query);
+//            }
+//
+//            /**
+//             * Execute the query and get the first result.
+//             *
+//             * @param  array $columns
+//             * @return \Illuminate\Database\Eloquent\Model|object|static|null
+//             */
+//            public function first($columns = ['*'])
+//            {
+//                /** @var Model $user */
+//                $user = $this->take(1)->get($columns)->first();
+//
+////                //從別的模型查數據  設置到這個模型裏面
+////                if ($user != null) {
+////                    $profile = UserProfile::query()
+////                        ->where('user_id', '=', $user->getAttributeValue('id'))
+////                        ->first();
+////
+////                    if (!empty($profile)) {
+////                        $profile = $profile->toArray();
+////                        $profile['profile_id'] = $profile['id'];
+////                        unset($profile['id']);
+////                        foreach ($profile as $key => $value) {
+////                            $user->setAttribute($key, $value);
+////                        }
+////                    }
+////
+////                    $third = UserThird::query()->where('user_id', '=', $user->getAttributeValue('id'))->take(2)
+////                        ->get();
+////                    if (!empty($third)) {
+////                        $third = $third->toArray();
+////                        $user->setAttribute('third', $third);
+////                    }
+////                }
+//                return $user;
+//            }
+//
+//        };
+//        $builder->setModel($this);
+//        return $builder;
+//    }
 
     public function getAuthIdentifierName()
     {
