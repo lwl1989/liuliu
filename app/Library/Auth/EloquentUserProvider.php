@@ -67,6 +67,7 @@ class EloquentUserProvider extends \Illuminate\Auth\EloquentUserProvider
 
             return $model;
         } catch (\Exception $exception) {
+            var_dump($exception);
             return null;
         }
     }
