@@ -43,7 +43,8 @@ class TokenGuard implements Guard
      * Create a new authentication guard.
      *
      * @param  \Illuminate\Contracts\Auth\UserProvider $provider
-     * @param  \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request                $request
+     *
      * @return void
      */
     public function __construct(UserProvider $provider, Request $request)
@@ -72,10 +73,8 @@ class TokenGuard implements Guard
         $user = null;
 
         $token = $this->getTokenForRequest();
-        var_dump($token);
         $user = $this->provider->retrieveByToken('', $token);
-        var_dump($user);
-        if(is_null($user)) {
+        if (is_null($user)) {
             throw new AuthenticationException('Unauthenticated.');
         }
         return $this->user = $user;
@@ -116,11 +115,12 @@ class TokenGuard implements Guard
      * Validate a user's credentials.
      *
      * @param  array $credentials
+     *
      * @return bool
      */
     public function validate(array $credentials = [])
     {
-        if($this->provider->retrieveById($this->uid)) {
+        if ($this->provider->retrieveById($this->uid)) {
             return true;
         }
 
@@ -131,6 +131,7 @@ class TokenGuard implements Guard
      * Set the current request instance.
      *
      * @param  \Illuminate\Http\Request $request
+     *
      * @return $this
      */
     public function setRequest(Request $request)

@@ -12,8 +12,9 @@ use App\Library\Constant\Redis as RedisConstant;
 class EloquentUserProvider extends \Illuminate\Auth\EloquentUserProvider
 {
     /**
-     * @param mixed $identifier
+     * @param mixed  $identifier
      * @param string $token
+     *
      * @return \Illuminate\Contracts\Auth\Authenticatable|\Illuminate\Database\Eloquent\Model|null|object
      */
     public function retrieveByToken($identifier, $token)
@@ -32,13 +33,14 @@ class EloquentUserProvider extends \Illuminate\Auth\EloquentUserProvider
      */
     public function createModel()
     {
-        $class = '\\'.ltrim($this->model, '\\');
+        $class = '\\' . ltrim($this->model, '\\');
 
         return new $class;
     }
 
     /**
      * @param string $token
+     *
      * @return \Illuminate\Contracts\Auth\Authenticatable|null|object|static
      */
     private function retrieveByRestfulToken(string $token)
@@ -47,21 +49,18 @@ class EloquentUserProvider extends \Illuminate\Auth\EloquentUserProvider
         //$token
         try {
 
-                $uid = $this->_validateToken($token);
-                var_dump($uid);
-                $model = $this->createModel();
-                var_dump($model);
-                $model = $model->newQuery()
-                    ->where($model->getAuthIdentifierName(), $uid)
-                    ->first();
+            $uid = $this->_validateToken($token);
+            $model = $this->createModel();
+            $model = $model->newQuery()
+                ->where($model->getAuthIdentifierName(), $uid)
+                ->first();
+            if (empty($model)) {
+                return null;
+            }
 
-                if (empty($model)) {
-                    return null;
-                }
-
-                if (!$this->_checkToken($model, $token)) {
-                    return null;
-                }
+            if (!$this->_checkToken($model, $token)) {
+                return null;
+            }
 
             return $model;
         } catch (\Exception $exception) {
@@ -70,41 +69,40 @@ class EloquentUserProvider extends \Illuminate\Auth\EloquentUserProvider
     }
 
     /**
-     * @param $user
+     * @param        $user
      * @param string $token
+     *
      * @return bool
      */
-    private function _checkToken($user, string $token) : bool
+    private function _checkToken($user, string $token): bool
     {
-        if ($user instanceof Admin){
-            return true;
-        }
 
         if ($user instanceof Users) {
             $user = $user->toArray();
         }
+        return true;
+        //        if (is_array($user) && isset($user['login_token'])) {
+        //            if (isset($user['login_token']) and $user['login_token'] == $token) {
+        //                return true;
+        //            }
+        //        }
 
-        if (is_array($user) && isset($user['login_token'])) {
-            if (isset($user['login_token']) and $user['login_token'] == $token) {
-                return true;
-            }
-        }
-
-        return false;
+        //        return false;
     }
 
     /**
      * @param string $token
+     *
      * @return int
      * @throws AuthenticationException
      */
     private function _validateToken(string $token): int
     {
         //nPnyxtKN8oZgoV4Lrttjzq26Lxfq7bqaZfbUsoZ8WFYlDwYhQztKQ1-wlpYjHNV3xc8bgJLPuw73Vo_knwgzbnwRh2lMEL1pd3rgPpkumwg
-        try{
+        try {
             $user = Encrypt::auth($token);
             $uid = $user['uid'];
-        }catch (\Exception $exception) {
+        } catch (\Exception $exception) {
             throw new AuthenticationException('Unauthenticated.');
         }
 
