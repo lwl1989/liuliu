@@ -69,7 +69,7 @@ class WxController extends Controller
             'device_uuid'  => 123
         ]);
         return [
-            'token' => $res['token']
+            'token' => $res
         ];
     }
 }
