@@ -48,15 +48,11 @@ class EloquentUserProvider extends \Illuminate\Auth\EloquentUserProvider
         //解析token 獲取到ID
         //$token
         try {
-            var_dump($token);
             $uid = $this->_validateToken($token);
-            var_dump($uid);
             $model = $this->createModel();
-            var_dump($model);
             $model = $model->newQuery()
                 ->where($model->getAuthIdentifierName(), $uid)
                 ->first();
-            var_dump($model);
             if (empty($model)) {
                 return null;
             }
@@ -67,7 +63,6 @@ class EloquentUserProvider extends \Illuminate\Auth\EloquentUserProvider
 
             return $model;
         } catch (\Exception $exception) {
-            var_dump($exception);
             return null;
         }
     }
