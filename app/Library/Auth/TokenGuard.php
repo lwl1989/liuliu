@@ -72,9 +72,9 @@ class TokenGuard implements Guard
         $user = null;
 
         $token = $this->getTokenForRequest();
-
+        var_dump($token);
         $user = $this->provider->retrieveByToken('', $token);
-
+        var_dump($user);
         if(is_null($user)) {
             throw new AuthenticationException('Unauthenticated.');
         }
