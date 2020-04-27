@@ -14,6 +14,10 @@
 Route::group(['middleware' => ['format']], function () {
     Route::get('wx/login','Auth\WxController@login');
 });
+
+Route::group(['middleware' => ['format','auth:c_api']], function () {
+    Route::get('wx/login','Auth\WxController@login1');
+});
 //
 //
 //Route::get('/abc', function (Request $request){

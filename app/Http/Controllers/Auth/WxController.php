@@ -8,7 +8,12 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Exceptions\ErrorConstant;
 use App\Http\Controllers\Controller;
+use App\Library\Auth\Encrypt;
+use App\Models\RegisterUsers\UserBind;
+use App\Models\RegisterUsers\Users;
+use App\Models\RegisterUsers\UserThird;
 use Iwanli\Wxxcx\Wxxcx;
 
 class WxController extends Controller
@@ -22,23 +27,39 @@ class WxController extends Controller
 
     public function login() : array
     {
-        //code 在小程序端使用 wx.login 获取
         $code = request('code', '');
-        //encryptedData 和 iv 在小程序端使用 wx.getUserInfo 获取
         $encryptedData = request('encryptedData', '');
         $iv = request('iv', '');
 
-        //根据 code 获取用户 session_key 等信息, 返回用户openid 和 session_key
         $userInfo = $this->wxxcx->getLoginInfo($code);
 
-        //todo:check exist
-        //todo:insert or update login log
+        $exists = UserBind::query()->where('open_id', $userInfo['openid'])->first(['id']);
+        if (empty($exists)) {
+            $uid = Users::query()->insertGetId([
+                'username' =>  $userInfo['openid'],
+                'password' =>  '',
+                'typ'      =>  3 //wechat
+            ]);
+            UserBind::query()->insert([
+                'user_id'   =>  $uid,
+                'typ'       =>  3
+            ]);
+        }else{
+            $uid = $exists['uid'];
+        }
+
+        $encrypt = Encrypt::getLoginResult(['uid' => $uid, 'device_uuid' => $userInfo['openid']]);
         //获取解密后的用户信息
         $result = $this->wxxcx->getUserInfo($encryptedData, $iv);
         if(is_array($result)) {
+            $result['token'] = $encrypt['token'];
             return $result;
         }
 
         return json_decode($result, true);
+    }
+
+    public function login1() : array  {
+        return [];
     }
 }

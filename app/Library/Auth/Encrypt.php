@@ -30,18 +30,6 @@ class Encrypt
             if (!isset($data['uid'])) {
                 throw new \Exception('ReGenerateToken lost params uid', ErrorConstant::SYSTEM_ERR);
             }
-            //如果意外情況登出，儅有新設備登入時，注銷掉原來的token
-            $oneDeviceUsers = Users::query()->where('device_uuid',$data['device_uuid'])
-                ->where('id','!=', $data['uid'])
-                ->get(['id'])->toArray();
-            if(!empty($oneDeviceUsers)) {
-                $ids = array_column($oneDeviceUsers, 'id');
-                Users::query()->whereIn('id',$ids)->update([
-                    'login_token'   =>  '',
-                    'fcm_token'     =>  ''
-                ]);
-            }
-            $data['visitor'] = false;
             $token = self::generateToken($data);
         } catch (\Exception $exception) {
             return ['code' => ErrorConstant::SYSTEM_ERR, 'response' => $exception->getMessage()];
