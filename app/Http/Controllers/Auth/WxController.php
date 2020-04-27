@@ -62,4 +62,14 @@ class WxController extends Controller
     public function login1() : array  {
         return [];
     }
+
+    public function getToken() : array  {
+        $res = Encrypt::generateToken([
+            'uid'   =>  1,
+            'device_uuid'  => 123
+        ]);
+        return [
+            'token' => $res['token']
+        ];
+    }
 }
