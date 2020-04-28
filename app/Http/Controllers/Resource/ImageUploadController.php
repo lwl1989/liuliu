@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Resource;
 
 use App\Exceptions\ErrorConstant;
 use App\Http\Controllers\Controller;
+use App\Services\OssService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -19,14 +20,12 @@ class ImageUploadController extends Controller
     {
         $path = $request->getRequestUri();
 
-		if (strpos($path, 'api/') === 1) {
-			$path = substr($path, 4);
-		}
+        if (strpos($path, 'api/') === 1) {
+            $path = substr($path, 4);
+        }
 
         $allow = [
-            '/user/avatar', '/goods/cover', '/goods/cate/cover', '/message/setting/image', '/department/group/file', '/department/image',
-            '/content/ad/cover', '/content/banner/cover', '/content/app/icon', '/content/welcome/cover', '/shop/cover', '/activity/answer/file',
-	        '/preferential/cover', '/preferential/content', '/tax/licence/file'
+            '/static/user/avatar', '/static/content/cover', '/static/content/images', '/static/content/videos'
         ];
 
         if (!in_array($path, $allow)) {
@@ -39,33 +38,35 @@ class ImageUploadController extends Controller
         // Storage::putFileAs('photos', new File('/path/to/photo'), 'photo.jpg');
         //通過path獲取路徑
 
-	    $file = $request->file('file');
+        $file = $request->file('file');
 
-	    $md5 = md5(time());
-	    $path = sprintf('%s/%s/%s/%s', $path, $md5[0], $md5[1], $md5[2]);
+        $md5 = md5(time() . $file->getClientOriginalName());
+        $path = sprintf('%s/%s/%s/%s', $path, $md5[0], $md5[1], $md5[2]);
 
-	    //if ($file->isValid()) {
-		    $originalName = $file->getClientOriginalName(); // 文件原名
-		    $ext = $file->getClientOriginalExtension();     // 擴展名
-		    $realPath = $file->getRealPath();   //臨時文件的絕對路徑
-		    $type = $file->getClientMimeType();     // image/jpeg
+        //if ($file->isValid()) {
+        $originalName = $file->getClientOriginalName(); // 文件原名
+        $ext = $file->getClientOriginalExtension();     // 擴展名
+        $realPath = $file->getRealPath();   //臨時文件的絕對路徑
+        $type = $file->getClientMimeType();     // image/jpeg
+        $path = substr($path, 1) . '/' . uniqid() . '.' . $ext;
+        OssService::publicUpload('liuliu-static', $md5, $path);
 
-		    if ($type !== 'image/png' || $type !== 'image/jpg' || $type !== 'image/jpeg' ) {
-			    $path = substr($path, 1) . '/'.  uniqid() . '.' . $ext;
-			    Storage::disk('public')->put($path, file_get_contents($realPath));
-		    } else {//application/vnd.ms-excel
-			    //手動指定驅動爲public
-			    $path = Storage::disk('public')->put($path, $file);
-		    }
 
-		    $sfsHost = env('SFS_URL', null);
+        //        if ($type !== 'image/png' || $type !== 'image/jpg' || $type !== 'image/jpeg') {
+        //            Storage::disk('public')->put($path, file_get_contents($realPath));
+        //        } else {//application/vnd.ms-excel
+        //            //手動指定驅動爲public
+        //            $path = Storage::disk('public')->put($path, $file);
+        //        }
 
-		    if (empty($sfsHost)) {
-			    $url = $request->getSchemeAndHttpHost() . Storage::url($path);
-		    } else {
-			    $url = rtrim($sfsHost, '/') . Storage::url($path);
-		    }
-	    //}
+        $sfsHost = env('SFS_URL', null);
+        $url = OssService::getPublicObjectURL('liuliu-static', $md5);
+        //        if (empty($sfsHost)) {
+        //            $url = $request->getSchemeAndHttpHost() . Storage::url($path);
+        //        } else {
+        //            $url = rtrim($sfsHost, '/') . Storage::url($path);
+        //        }
+        //}
 
         return ['name' => $originalName, 'path' => $path, 'url' => $url, 'type' => $type];
 

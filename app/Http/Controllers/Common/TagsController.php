@@ -48,4 +48,32 @@ class TagsController extends Controller
 
         return ['tags' => $tags];
     }
+
+    public function getMenu() : array {
+        $myTags = UserSubTags::query()
+            ->where('user_id', Auth::id())
+            ->where('status', Common::STATUS_NORMAL)
+            ->orderBy('create_time', 'desc')->get();
+        if(!is_array($myTags)) {
+            $myTags = Tags::query()->where('status', Common::STATUS_NORMAL)->orderBy('sort', 'desc')->limit(6)->get();
+        }
+
+        array_unshift($myTags, [
+            'name'  =>  '推荐',
+            'id'    =>  -2,
+            'sort'  =>  9999998,
+            'status'=>  Common::STATUS_NORMAL,
+            'create_time'   => '0000-00-00 00:00:00',
+            'update_time'   => '0000-00-00 00:00:00'
+        ]);
+        array_unshift($myTags, [
+            'name'  =>  '关注',
+            'id'    =>  -1,
+            'sort'  =>  9999999,
+            'status'=>  Common::STATUS_NORMAL,
+            'create_time'   => '0000-00-00 00:00:00',
+            'update_time'   => '0000-00-00 00:00:00'
+        ]);
+        return $myTags;
+    }
 }
