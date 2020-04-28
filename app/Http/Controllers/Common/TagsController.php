@@ -19,11 +19,11 @@ class TagsController extends Controller
 {
     public function getList(): array
     {
-        $tags = Tags::query()->where('status=?', Common::STATUS_NORMAL)->orderBy('sort', 'desc')->get();
+        $tags = Tags::query()->where('status', Common::STATUS_NORMAL)->orderBy('sort', 'desc')->get();
 
         $myTags = UserSubTags::query()
-            ->where('user_id=?', Auth::id())
-            ->where('status=?', Common::STATUS_NORMAL)
+            ->where('user_id', Auth::id())
+            ->where('status', Common::STATUS_NORMAL)
             ->orderBy('create_time', 'desc')->get();
 
         if (is_array($tags) and is_array($myTags)) {
@@ -43,7 +43,7 @@ class TagsController extends Controller
 
     public function getAll(): array
     {
-        $tags = Tags::query()->where('status=?', Common::STATUS_NORMAL)->orderBy('sort', 'desc')->get();
+        $tags = Tags::query()->where('status', Common::STATUS_NORMAL)->orderBy('sort', 'desc')->get();
 
 
         return ['tags' => $tags];
