@@ -1,11 +1,14 @@
 {
     "name": "laravel/laravel",
     "description": "The Laravel Framework.",
-    "keywords": ["framework", "laravel"],
+    "keywords": [
+        "framework",
+        "laravel"
+    ],
     "license": "MIT",
     "type": "project",
     "require": {
-        "php": ">=7.0.0",
+        "php": ">=7.2.0",
         "bacon/bacon-qr-code": "^2.0",
         "bupt1987/html-parser": "^3.0",
         "fideloper/proxy": "~3.3",
@@ -13,7 +16,7 @@
         "guzzlehttp/guzzle": "^6.3",
         "iwanli/wxxcx": "^2.0",
         "johnlui/aliyun-oss": "^2.2",
-        "laravel/framework": "5.5.*",
+        "laravel/framework": "^5.8.0",
         "laravel/tinker": "~1.0",
         "maatwebsite/excel": "^3.0",
         "picqer/php-barcode-generator": "^0.2.2",
@@ -43,8 +46,7 @@
     },
     "extra": {
         "laravel": {
-            "dont-discover": [
-            ]
+            "dont-discover": []
         }
     },
     "scripts": {
