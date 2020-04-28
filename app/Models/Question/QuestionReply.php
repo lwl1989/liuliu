@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Models\RegisterUsers;
+namespace App\Models\Question;
 
 use App\Models\Model;
 
 
-class UserOpLog extends Model
+class QuestionReply extends Model
 {
-    public $table = 'user_op_log';
+    public $table = 'question_reply';
 
 
     public $timestamps = true;

@@ -5,9 +5,9 @@ namespace App\Models\RegisterUsers;
 use App\Models\Model;
 
 
-class UserOpLog extends Model
+class UserCoach extends Model
 {
-    public $table = 'user_op_log';
+    public $table = 'user_coach';
 
 
     public $timestamps = true;

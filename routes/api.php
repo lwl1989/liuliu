@@ -14,10 +14,11 @@
 Route::group(['middleware' => ['format']], function () {
     Route::get('wx/login','Auth\WxController@login');
     Route::get('wx/token','Auth\WxController@getToken');
+    Route::get('tags/all','Common\TagsController@getAll');
 });
 
 Route::group(['middleware' => ['format','auth:c_api']], function () {
-    Route::get('wx/login1','Auth\WxController@login1');
+    Route::get('user/tags','Common\TagsController@getList');
 });
 //
 //
