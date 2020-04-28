@@ -40,4 +40,12 @@ class TagsController extends Controller
 
         return ['tags' => $tags, 'my_tags' => $myTags];
     }
+
+    public function getAll(): array
+    {
+        $tags = Tags::query()->where('status=?', Common::STATUS_NORMAL)->orderBy('sort', 'desc')->get();
+
+
+        return ['tags' => $tags];
+    }
 }
