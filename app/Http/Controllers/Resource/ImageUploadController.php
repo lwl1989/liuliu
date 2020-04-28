@@ -49,7 +49,7 @@ class ImageUploadController extends Controller
         $realPath = $file->getRealPath();   //臨時文件的絕對路徑
         $type = $file->getClientMimeType();     // image/jpeg
         $path = substr($path, 1) . '/' . uniqid() . '.' . $ext;
-        OssService::publicUpload('liuliu-static', $md5, $path);
+        OssService::publicUpload('liuliu-static', $path, $realPath);
 
 
         //        if ($type !== 'image/png' || $type !== 'image/jpg' || $type !== 'image/jpeg') {
@@ -60,7 +60,7 @@ class ImageUploadController extends Controller
         //        }
 
         $sfsHost = env('SFS_URL', null);
-        $url = OssService::getPublicObjectURL('liuliu-static', $md5);
+        $url = OssService::getPublicObjectURL('liuliu-static', $path);
         //        if (empty($sfsHost)) {
         //            $url = $request->getSchemeAndHttpHost() . Storage::url($path);
         //        } else {
