@@ -27,10 +27,12 @@ class WxController extends Controller
 
 
     /**
-     * 微信登录并自动注册
-     * GET /api/wx/login
-     *
-     * @param
+     * @api {get} /user/{id} 获取用户信息
+     * @apiGroup User
+     * @apiName Get-user
+     */
+    /**
+     * @Name 微信登录并自动注册
      * @return array
      * @throws
      */
