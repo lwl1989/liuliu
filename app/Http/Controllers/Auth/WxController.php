@@ -25,6 +25,15 @@ class WxController extends Controller
         $this->wxxcx = $wxxcx;
     }
 
+
+    /**
+     * 微信登录并自动注册
+     * GET /api/wx/login
+     *
+     * @param
+     * @return array
+     * @throws
+     */
     public function login() : array
     {
         $code = request('code', '');
