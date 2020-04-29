@@ -27,9 +27,21 @@ class WxController extends Controller
 
 
     /**
-     * @api {get} /user/{id} 获取用户信息
-     * @apiGroup User
-     * @apiName Get-user
+     * @api {get} /api/wx/login 微信登录并自动注册(wx小程序回调)
+     * @apiGroup 登录
+     * @apiName login
+     *
+     * @apiParam {String} code
+     * @apiParam {String} encryptedData
+     * @apiParam {String} iv
+     * @apiVersion 1.0.0
+     *
+     * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "token": "session验证str",
+     *       "user": {//用户信息}
+     *     }
      */
     /**
      * @Name 微信登录并自动注册
@@ -61,15 +73,20 @@ class WxController extends Controller
             $uid = $exists['uid'];
         }
 
-        $encrypt = Encrypt::getLoginResult(['uid' => $uid, 'device_uuid' => $userInfo['openid']]);
         //获取解密后的用户信息
         $result = $this->wxxcx->getUserInfo($encryptedData, $iv);
         if(is_array($result)) {
-            $result['token'] = $encrypt['token'];
+            //$result['token'] = $encrypt['token'];
             return $result;
         }
+        $encrypt = Encrypt::getLoginResult(['uid' => $uid, 'device_uuid' => $userInfo['openid']]);
 
-        return json_decode($result, true);
+        $user = json_decode($result, true);
+        $user['id'] = $uid;
+        return [
+            'token' =>  $encrypt['token'],
+            'user'  =>  $user
+        ];
     }
 
     public function login1() : array  {

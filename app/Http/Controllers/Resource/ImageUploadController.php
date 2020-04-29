@@ -16,6 +16,24 @@ class ImageUploadController extends Controller
         return $this->cover($request);
     }
 
+    /**
+     *  '/static/user/avatar', '/static/content/cover', '/static/content/images', '/static/content/videos'
+     * @api               {get} /api/static/user/avatar 上传
+     * @apiGroup          用户操作
+     * @apiName           上传文件
+     *
+     * @apiParam {File} file
+     * @apiVersion        1.0.0
+     *
+     * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     *   {
+     *      "name": "u=53064636,2739699047&fm=74&app=80&f=PNG&size=f121,140.jpeg",
+     *      "path": "static/user/avatar/9/9/b/5ea82ae60eeeb.jpeg",
+     *      "url": "http://liuliu-static.oss-cn-beijing.aliyuncs.com/static/user/avatar/9/9/b/5ea82ae60eeeb.jpeg",
+     *     "type": "image/jpeg"
+     *   }
+     */
     public function cover(Request $request)
     {
         $path = $request->getRequestUri();

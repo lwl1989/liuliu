@@ -19,7 +19,7 @@ Route::group(['middleware' => ['format']], function () {
 
 Route::group(['middleware' => ['format','auth:c_api']], function () {
     Route::get('user/tags','Common\TagsController@getList');
-
+    Route::get('user/menu','Common\TagsController@getMenu');
     Route::group(['prefix' => 'static'],function (){
         Route::post('user/avatar', 'Resource\ImageUploadController@upload');
     });
