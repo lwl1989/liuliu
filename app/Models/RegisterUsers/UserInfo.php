@@ -15,7 +15,7 @@ class UserInfo extends Model
     public $table = 'user_info';
 
 
-    public $timestamps = true;
+    public $timestamps = false;
     const CREATED_AT = 'create_time';
     const UPDATED_AT = 'update_time';
 

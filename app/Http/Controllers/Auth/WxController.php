@@ -12,6 +12,7 @@ use App\Exceptions\ErrorConstant;
 use App\Http\Controllers\Controller;
 use App\Library\Auth\Encrypt;
 use App\Models\RegisterUsers\UserBind;
+use App\Models\RegisterUsers\UserInfo;
 use App\Models\RegisterUsers\Users;
 use App\Models\RegisterUsers\UserThird;
 use Iwanli\Wxxcx\Wxxcx;
@@ -48,55 +49,80 @@ class WxController extends Controller
      * @return array
      * @throws
      */
-    public function login() : array
+    public function login(): array
     {
         $code = request('code', '');
         $encryptedData = request('encryptedData', '');
         $iv = request('iv', '');
 
         $userInfo = $this->wxxcx->getLoginInfo($code);
-        if(!isset($userInfo['openid'])) {
-            return ['code'  =>  ErrorConstant::DATA_ERR, 'response' =>  'verify error'];
+        if (!isset($userInfo['openid'])) {
+            return ['code' => ErrorConstant::DATA_ERR, 'response' => 'verify error'];
         }
         $exists = UserBind::query()->where('open_id', $userInfo['openid'])->first(['id']);
         if (empty($exists)) {
             $uid = Users::query()->insertGetId([
-                'username' =>  $userInfo['openid'],
-                'password' =>  '',
-                'typ'      =>  3 //wechat
+                'username' => $userInfo['openid'],
+                'password' => '',
+                'typ' => 3 //wechat
             ]);
             UserBind::query()->insert([
-                'user_id'   =>  $uid,
-                'typ'       =>  3
+                'user_id' => $uid,
+                'typ' => 3
             ]);
-        }else{
+            $result = $this->wxxcx->getUserInfo($encryptedData, $iv);
+            if (is_array($result)) {
+                $user = $result;
+                //获取解密后的用户信息
+
+//        {
+//            "openId": "OPENID",
+//  "nickName": "NICKNAME",
+//  "gender": GENDER,
+//  "city": "CITY",
+//  "province": "PROVINCE",
+//  "country": "COUNTRY",
+//  "avatarUrl": "AVATARURL",
+//  "unionId": "UNIONID",
+//  "watermark": {
+//            "appid":"APPID",
+//    "timestamp":TIMESTAMP
+//  }
+//}
+                UserInfo::query()->insert([
+                    'nickname' => $result['nickName'],
+                    'gender' => $result['gender'],
+                    'city' => $result['city'],
+                    'province' => $result['province'],
+                    'country' => $result['country'],
+                    'avatar' => $result['avatarUrl'],
+                    'union_id' => $result['unionId'],
+                ]);
+            }
+        } else {
             $uid = $exists['uid'];
+            $user = UserInfo::query()->where('user_id', $uid)->first()->toArray();
         }
 
-        //获取解密后的用户信息
-        $result = $this->wxxcx->getUserInfo($encryptedData, $iv);
-        if(is_array($result)) {
-            //$result['token'] = $encrypt['token'];
-            return $result;
-        }
         $encrypt = Encrypt::getLoginResult(['uid' => $uid, 'device_uuid' => $userInfo['openid']]);
 
-        $user = json_decode($result, true);
         $user['id'] = $uid;
         return [
-            'token' =>  $encrypt['token'],
-            'user'  =>  $user
+            'token' => $encrypt['token'],
+            'user' => $user
         ];
     }
 
-    public function login1() : array  {
+    public function login1(): array
+    {
         return [];
     }
 
-    public function getToken() : array  {
+    public function getToken(): array
+    {
         $res = Encrypt::generateToken([
-            'uid'   =>  1,
-            'device_uuid'  => 123
+            'uid' => 1,
+            'device_uuid' => 123
         ]);
         return [
             'token' => $res
