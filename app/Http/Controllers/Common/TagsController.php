@@ -9,10 +9,12 @@
 namespace App\Http\Controllers\Common;
 
 
+use App\Exceptions\ErrorConstant;
 use App\Http\Controllers\Controller;
 use App\Library\Constant\Common;
 use App\Models\Common\Tags;
 use App\Models\RegisterUsers\UserSubTags;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class TagsController extends Controller
@@ -31,13 +33,13 @@ class TagsController extends Controller
      *     HTTP/1.1 200 OK
      *   {
      *      "tags": [ {
-    "id": "1",
-    "name": "真人秀",
-    "sort": "1",
-    "status": "1",
-    "create_time": "1588069984",
-    "update_time": "1588069984"
-    },],
+     * "id": "1",
+     * "name": "真人秀",
+     * "sort": "1",
+     * "status": "1",
+     * "create_time": "1588069984",
+     * "update_time": "1588069984"
+     * },],
      *      "my_tags": [{
      *                  //...
      *              }],
@@ -89,13 +91,13 @@ class TagsController extends Controller
      *     HTTP/1.1 200 OK
      *   {
      *      "tags": [ {
-                "id": "1",
-                "name": "真人秀",
-                "sort": "1",
-                "status": "1",
-                "create_time": "1588069984",
-                "update_time": "1588069984"
-                }],
+     * "id": "1",
+     * "name": "真人秀",
+     * "sort": "1",
+     * "status": "1",
+     * "create_time": "1588069984",
+     * "update_time": "1588069984"
+     * }],
      *   }
      */
     public function getMenu(): array
@@ -125,5 +127,44 @@ class TagsController extends Controller
             'update_time' => '0000-00-00 00:00:00'
         ]);
         return $myTags;
+    }
+
+    /**
+     * @api               {post} /api/user/tag/sub  用户选择标签
+     * @apiGroup          用户操作
+     * @apiName           用户选择标签
+     *
+     * @apiParam {Array} tag_ids
+     * @apiVersion        1.0.0
+     *
+     * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     */
+    public function subTag(Request $request)
+    {
+        $tagIds = $request->input('tag_ids', []);
+        if (empty($tagIds) || !is_array($tagIds)) {
+            return ['code' => ErrorConstant::PARAMS_ERROR, 'ids is null'];
+        }
+
+        $uid = Auth::id();
+        $existsId = UserSubTags::query()->where('user_id', $uid)->whereIn('tag_id', $tagIds)->get(['tag_id'])->toArray();
+        $notExistsId = UserSubTags::query()->where('user_id', $uid)->whereNotIn('tag_id', $tagIds)->get(['tag_id'])->toArray();
+
+        if (!empty($notExistsId)) {
+            UserSubTags::query()->where('user_id', $uid)->whereIn('tag_id', array_column($notExistsId, 'tag_id'))->delete();
+        }
+
+        if (!empty($existsId)) {
+            $insertIds = array_diff($tagIds, array_column($existsId, 'tag_id'));
+            foreach ($insertIds as $tagId) {
+                UserSubTags::query()->insert([
+                    'user_id' => $uid,
+                    'tag_id'  => $tagId,
+                    'sub_time' => date('Y-m-d H:i:s')
+                ]);
+            }
+        }
+        return [];
     }
 }

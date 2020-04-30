@@ -24,6 +24,13 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
         Route::post('user/avatar', 'Resource\ImageUploadController@upload');
     });
 
+
+    Route::group(['prefix' => 'content'],function (){
+        Route::post('comment', 'Content\ContentController@comment');
+        Route::post('release', 'Content\ContentController@release');
+        Route::post('/', 'Content\ContentController@myList');
+    });
+
 });
 //
 //

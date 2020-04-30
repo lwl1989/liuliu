@@ -26,6 +26,22 @@ use Illuminate\Support\Facades\DB;
 
 class ContentController extends Controller
 {
+    /**
+     * @api               {post} /api/content/release 评论文章
+     * @apiGroup          用户操作
+     * @apiName           发布文章
+     *
+     * @apiParam {String} category_id
+     * @apiParam {String} title
+     * @apiParam {String} typ
+     * @apiParam {String} content
+     * @apiParam {String} cover 封面图
+     * @apiParam {List} tag_ids  标签（支持多选？接口支持）
+     * @apiVersion        1.0.0
+     *
+     * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     */
     public function release(Request $request): array
     {
         DB::beginTransaction();
@@ -62,6 +78,32 @@ class ContentController extends Controller
         }
     }
 
+    /**
+     * @api               {get} /api/content/{tag_id} 标签列表
+     * @apiGroup          用户操作
+     * @apiName           获取不同标签下文章内容
+     *
+     * @apiVersion        1.0.0
+     *
+     * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     *   {
+     *      "contents": [
+     *          {
+     *              'content':{
+     *              "id": "1",
+     *              "name": "真人秀",
+     *              "sort": "1",
+     *              "status": "1",
+     *              "create_time": "1588069984",
+     *              "update_time": "1588069984"
+     *              },
+     *              'user':{//userinfo}
+     *          }
+     *          ,//...
+     *      ],
+     *   }
+     */
     public function myList(Request $request)
     {
         $tagId = $request->route('tag_id', 0);
@@ -94,7 +136,17 @@ class ContentController extends Controller
         ];
     }
 
-
+    /**
+     * @api               {post} /api/content/comment 评论文章
+     * @apiGroup          用户操作
+     * @apiName           评论文章
+     *
+     * @apiParam {String} content
+     * @apiVersion        1.0.0
+     *
+     * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     */
     public function comment(Request $request): array
     {
         $cid = $request->route('cid', 0);
