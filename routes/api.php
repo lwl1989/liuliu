@@ -21,6 +21,10 @@ Route::group(['middleware' => ['format']], function () {
         Route::get('answer/{uid}/{typ}','Users\UserCoachController@answers');
         Route::get('info/{uid}','Users\UserCoachController@info');
     });
+
+    Route::get('question/info/{id}', 'Content\QuestionController@info');
+    Route::get('questions', 'Content\QuestionController@timeLime');
+
 });
 
 Route::group(['middleware' => ['format','auth:c_api']], function () {
@@ -37,6 +41,9 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
         Route::post('/', 'Content\ContentController@myList');
     });
 
+    Route::group(['prefix' => 'question'],function (){
+        Route::post('release', 'Content\QuestionController@release');
+    });
 });
 //
 //

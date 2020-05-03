@@ -5,15 +5,18 @@ namespace App\Library\Constant;
 
 class Common
 {
-    //1 发布数 2问题数 3 被评论数 4评论数 5 点赞数 6 被点赞数 7回答数
+    //1 发布数 3 被评论数 4评论数 5 点赞数 6 被点赞数 7回答数 8 关注  9 被关注  10 问题数 11 被提问题数
     const USER_OP_RELEASE = 1;
-    const USER_OP_QUESTION =2;
     const USER_OP_BE_COMMENT = 3;
     const USER_OP_COMMENT = 4;
     const USER_OP_ZAN = 5;
     const USER_OP_BE_ZAN = 6;
     const USER_OP_ANSWER = 7;
+    const USER_OP_FOLLOW = 8;
+    const USER_OP_BE_FOLLOW = 9;
 
+    const USER_OP_QUESTION = 10;
+    const USER_OP_BE_QUESTION = 11;
     //共用
     const DELETED = 1;
     const NO_DELETE = 0;

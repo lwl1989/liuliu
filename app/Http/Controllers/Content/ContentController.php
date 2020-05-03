@@ -27,7 +27,7 @@ use Illuminate\Support\Facades\DB;
 class ContentController extends Controller
 {
     /**
-     * @api               {post} /api/content/release 评论文章
+     * @api               {post} /api/content/release 发布文章
      * @apiGroup          内容操作
      * @apiName           发布文章
      *
