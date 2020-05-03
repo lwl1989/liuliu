@@ -22,7 +22,7 @@ class TagsController extends Controller
     /**
      * @api               {get} /api/user/tags 选择标签页面
      * @apiGroup          用户操作
-     * @apiName           获取tag列表（首页）
+     * @apiName           获取tag列表
      *
      * @apiParam {String} code
      * @apiParam {String} encryptedData
@@ -32,14 +32,22 @@ class TagsController extends Controller
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
      *   {
-     *      "tags": [ {
+     *      "talk": [ {
      * "id": "1",
      * "name": "真人秀",
      * "sort": "1",
      * "status": "1",
      * "create_time": "1588069984",
      * "update_time": "1588069984"
-     * },],
+     * }],
+     * "write": [ {
+     *  "id": "1",
+     *  "name": "写",
+     *  "sort": "1",
+     *  "status": "1",
+     *  "create_time": "1588069984",
+     *  "update_time": "1588069984"
+     * }],
      *      "my_tags": [{
      *                  //...
      *              }],
@@ -63,18 +71,69 @@ class TagsController extends Controller
                 }
             }
 
+
             $tags = array_values($tags);
         }
 
-        return ['tags' => $tags, 'my_tags' => $myTags];
+        $talk = [];
+        $write = [];
+        foreach ($tags as $tag) {
+            if($tag['typ'] == 1) {
+                $talk[] = $tag;
+            }else{
+                $write[] = $tag;
+            }
+        }
+
+        return ['talk' => $talk, 'write'=>$write, 'my_tags' => $myTags];
     }
 
+    /**
+     * @api               {get} /api/tags （首页）
+     * @apiGroup          内容获取
+     * @apiName           获取tag列表（首页）
+     *
+     * @apiParam {String} code
+     * @apiParam {String} encryptedData
+     * @apiParam {String} iv
+     * @apiVersion        1.0.0
+     *
+     * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     *   {
+     *      "talk": [ {
+     * "id": "1",
+     * "name": "真人秀",
+     * "sort": "1",
+     * "status": "1",
+     * "create_time": "1588069984",
+     * "update_time": "1588069984"
+     * }],
+     * "write": [ {
+     *  "id": "1",
+     *  "name": "写",
+     *  "sort": "1",
+     *  "status": "1",
+     *  "create_time": "1588069984",
+     *  "update_time": "1588069984"
+     * }],
+     *   }
+     */
     public function getAll(): array
     {
         $tags = Tags::query()->where('status', Common::STATUS_NORMAL)->orderBy('sort', 'desc')->get();
 
+        $talk = [];
+        $write = [];
+        foreach ($tags as $tag) {
+            if($tag['typ'] == 1) {
+                $talk[] = $tag;
+            }else{
+                $write[] = $tag;
+            }
+        }
 
-        return ['tags' => $tags];
+        return ['talk' => $talk, 'write'=>$write];
     }
 
     /**
