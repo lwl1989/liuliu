@@ -15,6 +15,12 @@ Route::group(['middleware' => ['format']], function () {
     Route::get('wx/login','Auth\WxController@login');
     Route::get('wx/token','Auth\WxController@getToken');
     Route::get('tags/all','Common\TagsController@getAll');
+
+    Route::group(['prefix' => 'coach'], function (){
+        Route::get('content/{uid}/{typ}','Users\UserCoachController@contents');
+        Route::get('answer/{uid}/{typ}','Users\UserCoachController@answers');
+        Route::get('info/{uid}','Users\UserCoachController@info');
+    });
 });
 
 Route::group(['middleware' => ['format','auth:c_api']], function () {
