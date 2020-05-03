@@ -14,7 +14,6 @@
 Route::group(['middleware' => ['format']], function () {
     Route::get('wx/login','Auth\WxController@login');
     Route::get('wx/token','Auth\WxController@getToken');
-    Route::get('tags/all','Common\TagsController@getAll');
 
     Route::group(['prefix' => 'coach'], function (){
         Route::get('content/{uid}/{typ}','Users\UserCoachController@contents');
@@ -24,6 +23,7 @@ Route::group(['middleware' => ['format']], function () {
 
     Route::get('question/info/{id}', 'Content\QuestionController@info');
     Route::get('questions', 'Content\QuestionController@timeLime');
+    Route::get('tags', 'Common\TagsController@getAll');
 
 });
 
