@@ -36,7 +36,6 @@ class TopicController
      *    },//...
      * ]
      *
-     * @return array
      */
     public function recommend(): array
     {
@@ -77,7 +76,8 @@ class TopicController
      *          }
      *      ]
      * }
-     *
+     */
+    /**
      * @param Request $request
      *
      * @return array
