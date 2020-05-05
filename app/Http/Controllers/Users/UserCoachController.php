@@ -11,6 +11,7 @@ namespace App\Http\Controllers\Users;
 
 use App\Exceptions\ErrorConstant;
 use App\Http\Controllers\Controller;
+use App\Library\ArrayParse;
 use App\Library\Constant\Common;
 use App\Models\Common\Tags;
 use App\Models\Content\Content;
@@ -25,9 +26,73 @@ use App\Services\RegisterUsers\UserCoachService;
 use App\Services\RegisterUsers\UsersService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class UserCoachController extends Controller
 {
+    /**
+     * @api               {post} /api/coach/join 加入教练
+     * @apiGroup          用户操作
+     * @apiName           加入教练
+     *
+     * @apiParam {String} glory
+     * @apiParam {String} real_name
+     * @apiParam {String} job
+     * @apiParam {String} desc
+     * @apiParam {String} intro
+     * @apiParam {List} courses  课程
+     * @apiParam {List} services 服务项目
+     *
+     * @apiParam {List} tag_ids  教练擅长频道
+     * @apiVersion        1.0.0
+     *
+     * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     */
+    /**
+     * @param Request $request
+     *
+     * @return array
+     */
+    public function join(Request $request): array
+    {
+        DB::beginTransaction();
+        $uid = Auth::id();
+        $exists = UserCoach::query()->where('user_id', $uid)->first();
+        if ($exists) {
+            if ($exists->status == Common::STATUS_DISABLE) {
+                return ['code' => ErrorConstant::DATA_ERR, 'response' => '此账户已被禁止申请教练'];
+            } else {
+                return ['code' => ErrorConstant::DATA_ERR, 'response' => '已经申请过了'];
+            }
+        }
+        try {
+            $params = ArrayParse::checkParamsArray(['glory', 'real_name', 'job', 'desc', 'intro',
+                'courses', 'services'], $request->input());
+            $params['user_id'] = $uid;
+            $params['courses'] = is_array($params['courses']) ? implode(",", $params['courses']) : $params['courses'];
+            $params['services'] = is_array($params['services']) ? implode(",", $params['services']) : $params['services'];
+            $params['status'] = 3; // 待审核
+            $ucId = UserCoach::query()->insertGetId($params);
+
+            $tagParams = ArrayParse::arrayCopy(['tag_ids'], $request->input());
+            if (is_array($tagParams['tag_ids'])) {
+                $tagParams['tag_ids'] = array_values($tagParams['tag_ids']);
+                foreach ($tagParams['tag_ids'] as $tagId) {
+                    UserCoachTags::query()->insert([
+                        'tag_id' => $tagId,
+                        'coach_id' => $ucId
+                    ]);
+                }
+            }
+
+            DB::commit();
+            return ['id' => $ucId];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return ['code' => ErrorConstant::SYSTEM_ERR, 'response' => $e->getMessage()];
+        }
+    }
     /**
      * @api               {get} /api/tab/{tab_id} 按频道取教练列表
      * @apiGroup          内容获取
