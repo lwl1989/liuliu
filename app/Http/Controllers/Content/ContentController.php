@@ -19,7 +19,6 @@ use App\Models\Content\ContentCounts;
 use App\Models\Content\ContentTags;
 use App\Models\RegisterUsers\UserCounts;
 use App\Models\RegisterUsers\UserOpLog;
-use App\Models\RegisterUsers\UserZan;
 use App\Services\ContentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -196,5 +195,4 @@ class ContentController extends Controller
     }
 
 
-    }
 }

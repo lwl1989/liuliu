@@ -6,12 +6,13 @@
  * Time: 16:57
  */
 
-namespace App\Models\Content;
+namespace App\Http\Controllers\Content;
 
 
 use App\Exceptions\ErrorConstant;
 use App\Http\Controllers\Controller;
 use App\Library\Constant\Common;
+use App\Models\Content\ContentCounts;
 use App\Models\RegisterUsers\UserOpLog;
 use App\Models\RegisterUsers\UserZan;
 use Illuminate\Http\Request;
@@ -31,6 +32,11 @@ class ZanController extends Controller
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
+     */
+    /**
+     * @param Request $request
+     *
+     * @return array
      */
     public function zan(Request $request): array
     {
@@ -67,11 +73,17 @@ class ZanController extends Controller
      * @apiGroup          内容操作
      * @apiName           取消点赞
      *
-     * @apiParam {String} content
+     * @apiParam {String} cid  文章id
+     * @apiParam {String} typ  类型  1文章  2评论 3 问题 4回答
      * @apiVersion        1.0.0
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
+     */
+    /**
+     * @param Request $request
+     *
+     * @return array
      */
     public function unZan(Request $request): array
     {
