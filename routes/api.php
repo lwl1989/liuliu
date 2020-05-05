@@ -37,6 +37,11 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
     Route::get('user/menu','Common\TagsController@getMenu');
     Route::group(['prefix' => 'static'],function (){
         Route::post('user/avatar', 'Resource\ImageUploadController@upload');
+        Route::post('content/cover', 'Resource\ImageUploadController@upload');
+        Route::post('content/images', 'Resource\ImageUploadController@upload');
+        Route::post('content/videos', 'Resource\ImageUploadController@upload');
+        //Route::post('user/avatar', 'Resource\ImageUploadController@upload');
+        //Route::post('user/avatar', 'Resource\ImageUploadController@upload');
     });
 
 
@@ -48,6 +53,11 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
 
     Route::group(['prefix' => 'question'],function (){
         Route::post('release', 'Content\QuestionController@release');
+    });
+
+    Route::group(['prefix' => 'user'],function (){
+        Route::get('follows', 'Users\UserController@follows');
+        Route::get('contents', 'Users\UserController@contents');
     });
 });
 //

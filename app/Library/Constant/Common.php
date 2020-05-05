@@ -17,6 +17,11 @@ class Common
 
     const USER_OP_QUESTION = 10;
     const USER_OP_BE_QUESTION = 11;
+
+    //1 锦囊 2素材 3随记
+    const CONTENT_TYPE_BAG = 1;
+    const CONTENT_TYPE_MATERIAL = 2;
+    const CONTENT_TYPE_NOTES = 3;
     //共用
     const DELETED = 1;
     const NO_DELETE = 0;
@@ -45,25 +50,23 @@ class Common
 
     ];
     const PERMISSION_MAPPING_SHOP = [
-//        'exchange' => [
-//            'name' => '好禮兌換',
-//            'actions' => [
-//                [
-//                    'en' => 'goods',
-//                    'name' => '商品兌換',
-//                    'vue' => 'goods/list',
-//                ],
-//                [
-//                    'en' => 'record',
-//                    'name' => '兌換記錄查詢',
-//                    'vue' => 'goods/record',
-//                ],
-//            ]
-//        ]
+        //        'exchange' => [
+        //            'name' => '好禮兌換',
+        //            'actions' => [
+        //                [
+        //                    'en' => 'goods',
+        //                    'name' => '商品兌換',
+        //                    'vue' => 'goods/list',
+        //                ],
+        //                [
+        //                    'en' => 'record',
+        //                    'name' => '兌換記錄查詢',
+        //                    'vue' => 'goods/record',
+        //                ],
+        //            ]
+        //        ]
     ];
 
-    const PERMISSION_MAPPING = array(
-
-    );
+    const PERMISSION_MAPPING = array();
 
 }

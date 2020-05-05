@@ -1,86 +1,120 @@
 <?php
+
 namespace App\Http\Controllers\Users;
 
-use App\Exceptions\ErrorConstant;
-use App\Library\ArrayParse;
-use App\Library\Auth\Encrypt;
-use App\Library\Auth\RedisTokenCache;
+
+use App\Http\Controllers\Controller;
 use App\Library\Constant\Common;
-use App\Library\CountryCode;
-use App\Models\Admin;
-use App\Models\Model;
-use App\Models\RegisterUsers\UserOpLog;
-use App\Models\RegisterUsers\UserProfile;
+use App\Models\Content\Content;
+use App\Models\Content\ContentCounts;
+use App\Models\RegisterUsers\UserInfo;
+use App\Models\RegisterUsers\UserRelations;
 use App\Models\RegisterUsers\Users;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\HomeController;
-use App\Services\RegisterUsers\UsersService;
-use Illuminate\Support\Facades\Crypt;
-use App\Library\RedisFacade as Redis;
-use Illuminate\Support\Facades\Session;
 
-class UsersController extends HomeController
+class UsersController extends Controller
 {
-	const UNION_TABLE = 'user_profile';
+    /**
+     * @api               {get} /api/user/follows 我关注的教练
+     * @apiGroup          内容获取
+     * @apiName           我关注的教练
+     * @apiVersion        1.0.0
+     *
+     * @apiSuccessExample Success-Response
+     * [
+     *     {
+     *                  "user_id": "1",
+     *                  "nickname": "休息休息",
+     *                  "avatar": "https://xxxxxx/",
+     *    },//...
+     * ]
+     */
+    /**
+     * @param Request $request
+     *
+     * @return array
+     */
+    public function follows(Request $request): array
+    {
+        $uid = Auth::id();
 
-	/**
-	 * 列表
-	 * @param Request $request
-	 * @return array
-	 */
-	public function select(Request $request) : array
-	{
-		$page		= $request->get('page', 1);
-		$limit		= $request->get('limit', 10);
-		$type		= $request->get('type', 0);
-		$key		= $request->get('key', '');
-		$device_type= $request->get('device_type', 0);
-		$sex_type   = $request->get('sex_type', 0);
-		$time_type  = $request->get('time_type','');
-		$time       = $request->get('time','');
-		$digitalize_type = $request->get('digitalize_type', '-1');
+        $relations = UserRelations::query()
+            ->where('user_id', $uid)
+            ->where('status', Common::STATUS_NORMAL)
+            ->where('typ', 1)
+            ->get()
+            ->toArray();
 
-		if (!empty($time) && $time != 'null') {
-			$time = explode(',', $time);
-			$date_start = $time[0];
-			$date_end = $time[1];
-		}
+        if (empty($relations)) {
+            return ['coaches' => []];
+        }
 
-		$conditions = $this->search($type, $key, $device_type, $date_start ?? '', $date_end ?? '', $time_type, $digitalize_type, $sex_type);
-		$usersService = new UsersService();
-		$users = $usersService::limit($conditions, $limit, $page, false, 1);
-		$users = ArrayParse::encryptData($users,['id_number','residence','passport','email','source','source_id']);
-		$users = $this->deal($users);
+        $userIds = array_column($relations, 're_user_id');
+        $coaches = Users::query()->whereIn('user_id', $userIds)->get()->toArray();
 
-		return ['data' => $users];
-	}
+        return ['coaches' => $coaches];
+    }
 
-	/**
-	 * 總數
-	 * @param Request $request
-	 * @return array
-	 */
-	public function count(Request $request) : array
-	{
-		$type		= $request->get('type', 0);
-		$key		= $request->get('key', '');
-		$device_type= $request->get('device_type', 0);
-		$sex_type   = $request->get('sex_type', 0);
-		$time_type  = $request->get('time_type','');
-		$time       = $request->get('time','');
-		$digitalize_type = $request->get('digitalize_type', '-1');
+    /**
+     * @api               {get} /api/user/contents 我的feed流
+     * @apiGroup          内容获取
+     * @apiName           我的feed流
+     * @apiVersion        1.0.0
+     *
+     * @apiSuccessExample Success-Response
+     * {
+     *    "contents":[
+     *          {
+     *                "id":"1",
+     *                    "title":"xxxxx",
+     *                    "content":"xxxxxxxxxxxx",
+     *                    "user":{
+     *                          "user_id":"1",
+     *                          "avatar":"",
+     *                          "nickname":"xxxx"
+     *                      },
+     *                    "counts":{
+     *                      "3":"100",
+     *                      "6":"13567746",
+     *                    }
+     *          }
+     *      ]
+     * }
+     */
+    /**
+     * @param Request $request
+     *
+     * @return array
+     */
+    public function contents(Request $request) : array
+    {
+        $uid = Auth::id();
 
-		if (!empty($time) && $time != 'null') {
-			$time = explode(',', $time);
-			$date_start = $time[0];
-			$date_end = $time[1];
-		}
+        $relations = UserRelations::query()
+            ->where('user_id', $uid)
+            ->where('status', Common::STATUS_NORMAL)
+            ->where('typ', 1)
+            ->get()
+            ->toArray();
 
-		$conditions		= $this->search($type, $key, $device_type, $date_start ?? '', $date_end ?? '', $time_type, $digitalize_type, $sex_type);
-		$usersService	= new UsersService();
-		$count = $usersService::count($conditions, false, 1);
+        if (empty($relations)) {
+            return ['contents' => []];
+        }
 
-		return [ 'count' => $count ];
-	}
+        $userIds = array_column($relations, 're_user_id');
+        $contents = Content::query()
+            ->whereIn('user_id', $userIds)
+            ->where('status',Common::STATUS_NORMAL)
+            ->orderBy('create_time','desc')
+            ->get()
+            ->toArray();
+
+        $contents = UserInfo::getUserInfoWithList($contents);
+        $contents = ContentCounts::getContentsCounts($contents);
+
+        return [
+            'contents'  =>  $contents
+        ];
+    }
 }

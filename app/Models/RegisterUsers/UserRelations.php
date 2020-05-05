@@ -7,7 +7,7 @@ use App\Models\Model;
 
 class UserRelations extends Model
 {
-    public $table = 'user_relations';
+    public $table = 'user_relation';
 
 
     public $timestamps = true;

@@ -12,6 +12,7 @@ namespace App\Http\Controllers\Content;
 use App\Exceptions\ErrorConstant;
 use App\Library\Constant\Common;
 use App\Models\Content\Content;
+use App\Models\Content\ContentCounts;
 use App\Models\Content\ContentTags;
 use App\Models\Content\Topics;
 use App\Models\RegisterUsers\UserInfo;
@@ -69,6 +70,10 @@ class TopicController
      *                          "avatar":"",
      *                          "nickname":"xxxx"
      *                      },
+     *                    "counts":{
+     *                      "3":"100",
+     *                      "6":"13567746",
+     *                    }
      *          }
      *      ]
      * }
@@ -91,6 +96,7 @@ class TopicController
             $contentIds = array_column($contentIds, 'content_id');
             $contents = Content::query()->whereIn('id', $contentIds)->get()->toArray();
             $contents = UserInfo::getUserInfoWithList($contents);
+            $contents = ContentCounts::getContentsCounts($contents);
         }
         return [
             'topic' => $topic,

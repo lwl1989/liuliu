@@ -92,8 +92,8 @@ class ContentController extends Controller
     }
 
     /**
-     * @api               {get} /api/content/{tag_id} 标签内容列表
-     * @apiGroup          内容操作
+     * @api               {get} /api/content/{tag_id} 频道内容列表
+     * @apiGroup          内容获取（首页）
      * @apiName           获取不同标签下文章内容
      *
      * @apiVersion        1.0.0

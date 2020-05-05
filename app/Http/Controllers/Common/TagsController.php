@@ -89,13 +89,10 @@ class TagsController extends Controller
     }
 
     /**
-     * @api               {get} /api/tags （首页）
+     * @api               {get} /api/tags 获取所有频道标签
      * @apiGroup          内容获取
-     * @apiName           获取tag列表（首页）
+     * @apiName           获取所有频道标签
      *
-     * @apiParam {String} code
-     * @apiParam {String} encryptedData
-     * @apiParam {String} iv
      * @apiVersion        1.0.0
      *
      * @apiSuccessExample Success-Response:
