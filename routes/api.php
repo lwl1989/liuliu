@@ -15,12 +15,7 @@ Route::group(['middleware' => ['format']], function () {
     Route::get('wx/login','Auth\WxController@login');
     Route::get('wx/token','Auth\WxController@getToken');
 
-    Route::group(['prefix' => 'coach'], function (){
-        Route::get('content/{uid}/{typ}','Users\UserCoachController@contents');
-        Route::get('answer/{uid}/{typ}','Users\UserCoachController@answers');
-        Route::get('info/{uid}','Users\UserCoachController@info');
-        Route::get('recommend','Users\UserCoachController@recommend');
-    });
+
 
     Route::get('question/info/{id}', 'Content\QuestionController@info');
     Route::get('questions', 'Content\QuestionController@timeLime');
@@ -59,9 +54,17 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
         Route::get('follows', 'Users\UserController@follows');
         Route::get('contents', 'Users\UserController@contents');
 
-
+        Route::post('center', 'Users\UserController@center');
         Route::post('follow', 'Users\UserController@follow');
         Route::post('unfollow', 'Users\UserController@unFollow');
+    });
+
+    Route::group(['prefix' => 'coach'], function (){
+        Route::get('content/{uid}/{typ}','Users\UserCoachController@contents');
+        Route::get('answer/{uid}/{typ}','Users\UserCoachController@answers');
+        Route::get('info/{uid}','Users\UserCoachController@info');
+        Route::get('recommend','Users\UserCoachController@recommend');
+        Route::get('tag/{tab_id}','Users\UserCoachController@tab');
     });
 });
 //

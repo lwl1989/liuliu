@@ -12,18 +12,91 @@ namespace App\Http\Controllers\Users;
 use App\Exceptions\ErrorConstant;
 use App\Http\Controllers\Controller;
 use App\Library\Constant\Common;
+use App\Models\Common\Tags;
 use App\Models\Content\Content;
 use App\Models\Question\QuestionRelation;
 use App\Models\Question\QuestionReply;
 use App\Models\Question\Questions;
 use App\Models\RegisterUsers\UserCoach;
+use App\Models\RegisterUsers\UserCoachTags;
 use App\Models\RegisterUsers\UserInfo;
+use App\Models\RegisterUsers\UserRelations;
 use App\Services\RegisterUsers\UserCoachService;
 use App\Services\RegisterUsers\UsersService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserCoachController extends Controller
 {
+    /**
+     * @api               {get} /api/tab/{tab_id} 按频道取教练列表
+     * @apiGroup          内容获取
+     * @apiName           按频道取教练列表
+     * @apiVersion        1.0.0
+     *
+     * @apiSuccessExample Success-Response
+     * [
+     *     {
+     *                  "join_time":"2020-04-20 12:12:12",
+     *                  "tags"  :   [
+     *                          {"id":"1","name":"教练标签"},//...
+     *                  ],
+     *                    "intro":"dsadasdsa",
+     *                    "desc":"dasfghfdsfgdfgfhdg",
+     *                    "user":{
+     *                          "user_id":"111",
+     *                          "nickname":"dsadsad",
+     *                          "avatar":"erfgh"
+     *                      },
+     *                    "followed":"0" //0未关注  1已关注
+     *
+     *     }, //......
+     * ]
+     *
+     */
+    /**
+     * @param Request $request
+     *
+     * @return array
+     */
+    public function tab(Request $request): array
+    {
+        $tagId = $request->route('tag_id');
+        $coaches = UserCoachTags::query()->where('tag_id', $tagId)->get()->toArray();
+        if (empty($coaches)) {
+            return ['coaches' => []];
+        }
+
+        $coachIds = array_column($coaches, 'coach_id');
+        $coaches = UserCoach::query()->whereIn('id', $coachIds)->where('status', Common::STATUS_NORMAL)->get()->toArray();
+        if (empty($coaches)) {
+            return ['coaches' => []];
+        }
+
+        $userIds = array_column($coachIds, 'user_id');
+        $coachTags = UserCoachTags::query()->whereIn('coach_id', $coachIds)->get()->toArray();
+        $tagsIds = array_column($coachTags, 'tag_id');
+        $tags = Tags::query()->whereIn('id', $tagsIds)->get()->toArray();
+        $tags = array_column($tags, null, 'id');
+        $userInfo = UserInfo::query()->whereIn('user_id', $userIds)->get()->toArray();
+        $userInfo = array_column($userInfo, null, 'user_id');
+        $relations = UserRelations::followRelation(Auth::id(), $userIds);
+        foreach ($coaches as &$coach) {
+            $coach['tags'] = [];
+            foreach ($coachTags as $coachTag) {
+                if ($coachTag['coach_id'] == $coach['id']) {
+                    $coach['tags'][] = $tags[$coachTag['tag_id']];
+                }
+            }
+            $coach['user'] = $userInfo[$coach['user_id']];
+            $coach['followed'] = $relations[$coach['user_id']];
+            unset($coach);
+        }
+        return [
+            'coaches' => $userInfo
+        ];
+    }
+
     /**
      * @api               {get} /api/coach/recommend 首页推荐教练
      * @apiGroup          内容获取
@@ -39,6 +112,8 @@ class UserCoachController extends Controller
      *    },//...
      * ]
      *
+     */
+    /**
      * @return array
      */
     public function recommend(): array

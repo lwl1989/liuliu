@@ -8,16 +8,83 @@ use App\Http\Controllers\Controller;
 use App\Library\Constant\Common;
 use App\Models\Content\Content;
 use App\Models\Content\ContentCounts;
+use App\Models\RegisterUsers\UserCoach;
 use App\Models\RegisterUsers\UserCounts;
 use App\Models\RegisterUsers\UserInfo;
 use App\Models\RegisterUsers\UserOpLog;
 use App\Models\RegisterUsers\UserRelations;
 use App\Models\RegisterUsers\Users;
+use App\Models\RegisterUsers\UserSubTags;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class UsersController extends Controller
 {
+    /**
+     * @api               {get} /api/user/center 个人中心上半部
+     * @apiGroup          内容获取
+     * @apiName           个人中心上半部
+     *
+     * @apiVersion        1.0.0
+     *
+     * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     *   {
+     *              "user":{
+     *                  "id": "1",
+     *                  "nickname": "休息休息",
+     *                  "avatar": "https://xxxxxx/",
+     *              },
+     *              "tags"  :   [
+     *                          {"id":"1","name":"教练标签"},//...
+     *             ],
+     *              "counts": {
+     *                  "8":"12",
+     *                  "9":"90"
+     *              },
+     *             "is_coach":"1" // 1认证了 2 未认证
+     *    }
+     *
+     */
+    /**
+     * 个人中心
+     * @param Request $request
+     *
+     * @return array
+     */
+    public function center(Request $request) : array
+    {
+        $uid = Auth::id();
+
+        $info = UserInfo::query()->where('user_id',$uid)->first();
+        $tags = UserSubTags::query()->where('user_id', $uid)->get()->toArray();
+
+        $fansCount = 0;
+        $fans = UserCounts::query()->where('user_id', $uid)->where('typ', Common::USER_OP_BE_FOLLOW)->first(['counts']);
+        if($fans) {
+            $fansCount = ($fans->toArray())['counts'];
+        }
+
+        $followCount = 0;
+        $follows = UserCounts::query()->where('user_id', $uid)->where('typ', Common::USER_OP_FOLLOW)->first(['counts']);
+        if($follows) {
+            $followCount = ($follows->toArray())['counts'];
+        }
+        $isCoach = 0;
+        $coach = UserCoach::query()->where('user_id', $uid)->where('status',Common::STATUS_NORMAL)->first();
+        if($coach) {
+            $isCoach = 1;
+        }
+        return [
+            'user'  =>  $info,
+            'tags'  =>  $tags,
+            'counts'    =>  [
+                Common::USER_OP_BE_FOLLOW => $fansCount,
+                Common::USER_OP_FOLLOW  =>  $followCount
+            ],
+            'is_coach'  => $isCoach
+        ];
+    }
     /**
      * @api               {get} /api/user/follows 我关注的教练
      * @apiGroup          内容获取
