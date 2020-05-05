@@ -19,17 +19,17 @@ class UserCounts extends Model
     const CREATED_AT = 'create_time';
     const UPDATED_AT = 'update_time';
 
-    public static function incrementOrCreate($uid, int $typ)
+    public static function incrementOrCreate($uid, int $typ, int $amount = 1)
     {
         $exists = UserCounts::query()->where('user_id', $uid)->where('typ', $typ)->first('id');
         if (!empty($exists)) {
             UserCounts::query()->insert([
                 'user_id' => $uid,
-                'counts' => 1,
+                'counts' => $amount,
                 'typ' => $typ
             ]);
         } else {
-            UserCounts::query()->where('user_id', $uid)->where('typ', $typ)->increment('counts');
+            UserCounts::query()->where('user_id', $uid)->where('typ', $typ)->increment('counts', $amount);
         }
     }
 

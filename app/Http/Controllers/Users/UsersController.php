@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Users;
 
 
+use App\Exceptions\ErrorConstant;
 use App\Http\Controllers\Controller;
 use App\Library\Constant\Common;
 use App\Models\Content\Content;
 use App\Models\Content\ContentCounts;
+use App\Models\RegisterUsers\UserCounts;
 use App\Models\RegisterUsers\UserInfo;
+use App\Models\RegisterUsers\UserOpLog;
 use App\Models\RegisterUsers\UserRelations;
 use App\Models\RegisterUsers\Users;
 use Illuminate\Http\Request;
@@ -87,7 +90,7 @@ class UsersController extends Controller
      *
      * @return array
      */
-    public function contents(Request $request) : array
+    public function contents(Request $request): array
     {
         $uid = Auth::id();
 
@@ -105,8 +108,8 @@ class UsersController extends Controller
         $userIds = array_column($relations, 're_user_id');
         $contents = Content::query()
             ->whereIn('user_id', $userIds)
-            ->where('status',Common::STATUS_NORMAL)
-            ->orderBy('create_time','desc')
+            ->where('status', Common::STATUS_NORMAL)
+            ->orderBy('create_time', 'desc')
             ->get()
             ->toArray();
 
@@ -114,7 +117,107 @@ class UsersController extends Controller
         $contents = ContentCounts::getContentsCounts($contents);
 
         return [
-            'contents'  =>  $contents
+            'contents' => $contents
         ];
+    }
+
+
+    /**
+ * @api               {post} /api/user/follow 关注
+ * @apiGroup          用户操作
+ * @apiName           关注
+ *
+ * @apiParam {String} content
+ * @apiVersion        1.0.0
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ */
+    /**
+     * @param Request $request
+     *
+     * @return array
+     */
+    public function follow(Request $request): array
+    {
+        $sudId = $request->input('user_id');
+        if (!$sudId) {
+            return ['code' => ErrorConstant::PARAMS_ERROR];
+        }
+
+        $userId = Auth::id();
+        $exists = UserRelations::query()->where('user_id', $userId)->where('re_user_id', $sudId)
+            ->where('typ', 1)->first();
+        if (!$exists) {
+            UserRelations::query()->insert([
+                'user_id' => $userId,
+                'typ' => 1,
+                're_user_id' => $sudId
+            ]);
+
+            UserOpLog::query()->insert([
+                'user_id' => $userId,
+                'op_typ_id' => $sudId,
+                'typ' => Common::USER_OP_FOLLOW
+            ]);
+            UserOpLog::query()->insert([
+                'user_id' => $sudId,
+                'op_typ_id' => $userId,
+                'typ' => Common::USER_OP_BE_FOLLOW
+            ]);
+            UserCounts::incrementOrCreate($userId, Common::USER_OP_FOLLOW);
+            UserCounts::incrementOrCreate($sudId, Common::USER_OP_BE_FOLLOW);
+        } else {
+            $exists = $exists->toArray();
+            if ($exists['status'] == Common::STATUS_DISABLE) {
+                UserRelations::query()->where('id', $exists['id'])->update([
+                    'status' => Common::STATUS_NORMAL
+                ]);
+            }
+        }
+
+        return [];
+    }
+
+
+    /**
+     * @api               {post} /api/user/unfollow 取消关注
+     * @apiGroup          用户操作
+     * @apiName           取消关注
+     *
+     * @apiParam {String} content
+     * @apiVersion        1.0.0
+     *
+     * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     */
+    /**
+     * @param Request $request
+     *
+     * @return array
+     */
+    public function unFollow(Request $request): array
+    {
+        $sudId = $request->input('user_id');
+        if (!$sudId) {
+            return ['code' => ErrorConstant::PARAMS_ERROR];
+        }
+
+        $userId = Auth::id();
+        $exists = UserRelations::query()->where('user_id', $userId)->where('re_user_id', $sudId)
+            ->where('typ', 1)->first();
+        if (!$exists) {
+           return [];
+        } else {
+            $exists = $exists->toArray();
+            if ($exists['status'] == Common::STATUS_NORMAL) {
+                UserRelations::query()->where('id', $exists['id'])->update([
+                    'status' => Common::STATUS_DISABLE
+                ]);
+                UserCounts::incrementOrCreate($userId, Common::USER_OP_FOLLOW, -1);
+                UserCounts::incrementOrCreate($sudId, Common::USER_OP_BE_FOLLOW, -1);
+            }
+        }
+        return [];
     }
 }

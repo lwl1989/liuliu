@@ -58,6 +58,10 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
     Route::group(['prefix' => 'user'],function (){
         Route::get('follows', 'Users\UserController@follows');
         Route::get('contents', 'Users\UserController@contents');
+
+
+        Route::post('follow', 'Users\UserController@follow');
+        Route::post('unfollow', 'Users\UserController@unFollow');
     });
 });
 //

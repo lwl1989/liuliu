@@ -151,7 +151,7 @@ class ContentController extends Controller
 
     /**
      * @api               {post} /api/content/comment 评论文章
-     * @apiGroup          用户操作
+     * @apiGroup          内容操作
      * @apiName           评论文章
      *
      * @apiParam {String} content
