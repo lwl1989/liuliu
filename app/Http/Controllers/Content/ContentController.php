@@ -19,6 +19,7 @@ use App\Models\Content\ContentCounts;
 use App\Models\Content\ContentTags;
 use App\Models\RegisterUsers\UserCounts;
 use App\Models\RegisterUsers\UserOpLog;
+use App\Models\RegisterUsers\UserZan;
 use App\Services\ContentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -155,6 +156,8 @@ class ContentController extends Controller
      * @apiName           评论文章
      *
      * @apiParam {String} content
+     * @apiParam {String} cid  文章id
+     * @apiParam {String} pid  上一层评论id，第一层为0
      * @apiVersion        1.0.0
      *
      * @apiSuccessExample Success-Response:
@@ -162,8 +165,8 @@ class ContentController extends Controller
      */
     public function comment(Request $request): array
     {
-        $cid = $request->route('cid', 0);
-        $pid = $request->route('pid', 0);
+        $cid = $request->post('cid', 0);
+        $pid = $request->post('pid', 0);
         if (!$cid) {
             return ['code' => ErrorConstant::PARAMS_ERROR, 'response' => 'id错误'];
         }
@@ -190,5 +193,8 @@ class ContentController extends Controller
             DB::rollBack();
             return ['code' => ErrorConstant::SYSTEM_ERR, 'response' => $e->getMessage()];
         }
+    }
+
+
     }
 }
