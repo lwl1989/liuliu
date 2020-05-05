@@ -19,12 +19,17 @@ Route::group(['middleware' => ['format']], function () {
         Route::get('content/{uid}/{typ}','Users\UserCoachController@contents');
         Route::get('answer/{uid}/{typ}','Users\UserCoachController@answers');
         Route::get('info/{uid}','Users\UserCoachController@info');
+        Route::get('recommend','Users\UserCoachController@recommend');
     });
 
     Route::get('question/info/{id}', 'Content\QuestionController@info');
     Route::get('questions', 'Content\QuestionController@timeLime');
     Route::get('tags', 'Common\TagsController@getAll');
 
+    Route:group(['prefix'=>'topic'], function (){
+        Route::get('recommend','Content\TopicController@recommend');
+        Route::get('info/{id}','Content\TopicController@info');
+    });
 });
 
 Route::group(['middleware' => ['format','auth:c_api']], function () {

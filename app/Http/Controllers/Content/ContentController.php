@@ -31,12 +31,12 @@ class ContentController extends Controller
      * @apiGroup          内容操作
      * @apiName           发布文章
      *
-     * @apiParam {String} category_id
      * @apiParam {String} title
      * @apiParam {String} typ
      * @apiParam {String} content
      * @apiParam {String} cover 封面图
      * @apiParam {List} tag_ids  标签（支持多选？接口支持）
+     * @apiParam {List} topic_ids 话题（支持多选？接口支持）
      * @apiVersion        1.0.0
      *
      * @apiSuccessExample Success-Response:
@@ -47,7 +47,7 @@ class ContentController extends Controller
         DB::beginTransaction();
         $uid = Auth::id();
         try {
-            $params = ArrayParse::checkParamsArray(['category_id', 'title', 'typ', 'content', 'cover'], $request->input());
+            $params = ArrayParse::checkParamsArray(['title', 'typ', 'content', 'cover'], $request->input());
             $params['user_id'] = $uid;
             $cid = Content::query()->insertGetId($params);
 
@@ -59,7 +59,20 @@ class ContentController extends Controller
             foreach ($tagParams['tag_ids'] as $tagId) {
                 ContentTags::query()->insert([
                     'content_id' => $cid,
-                    'tag_id' => $tagId
+                    'relation_id' => $tagId
+                ]);
+            }
+
+            $tagParams = ArrayParse::checkParamsArray(['topic_ids'], $request->input());
+            if (!is_array($tagParams['topic_ids'])) {
+                throw new \Exception('ids为空', ErrorConstant::PARAMS_ERROR);
+            }
+            $tagParams['topic_ids'] = array_values($tagParams['topic_ids']);
+            foreach ($tagParams['topic_ids'] as $tagId) {
+                ContentTags::query()->insert([
+                    'content_id' => $cid,
+                    'relation_id' => $tagId,
+                    'typ' => 2
                 ]);
             }
 
@@ -123,7 +136,7 @@ class ContentController extends Controller
                 break;
             default:
                 //todo:先期每个条目最多200条，没那么多人划那么多条，按发布时间逆序即可
-                $contentBind = ContentTags::query()->where('tag_id', $tagId)->orderBy('id', 'desc')->limit(200)->get()->toArray();
+                $contentBind = ContentTags::query()->where('relation_id', $tagId)->where('typ', 1)->orderBy('id', 'desc')->limit(200)->get()->toArray();
 
                 if (!empty($contentBind)) {
                     $contentIds = array_column($contentBind, 'content_id');

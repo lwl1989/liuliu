@@ -16,12 +16,46 @@ use App\Models\Content\Content;
 use App\Models\Question\QuestionRelation;
 use App\Models\Question\QuestionReply;
 use App\Models\Question\Questions;
+use App\Models\RegisterUsers\UserCoach;
+use App\Models\RegisterUsers\UserInfo;
 use App\Services\RegisterUsers\UserCoachService;
 use App\Services\RegisterUsers\UsersService;
 use Illuminate\Http\Request;
 
 class UserCoachController extends Controller
 {
+    /**
+     * @api               {get} /api/coach/recommend 首页推荐教练
+     * @apiGroup          内容获取
+     * @apiName           获取教练基本信息
+     * @apiVersion        1.0.0
+     *
+     * @apiSuccessExample Success-Response
+     * [
+     *     {
+     *                  "user_id": "1",
+     *                  "nickname": "休息休息",
+     *                  "avatar": "https://xxxxxx/",
+     *    },//...
+     * ]
+     *
+     * @return array
+     */
+    public function recommend(): array
+    {
+        $coach = UserCoach::query()->where('status', Common::STATUS_NORMAL)->get(['user_id'])->toArray();
+
+        if (empty($coach)) {
+            return ['code' => ErrorConstant::DATA_ERR, 'response' => '暂时未有教练'];
+        }
+
+        $userIds = array_column($coach, 'user_id');
+        $infos = UserInfo::query()->whereIn('user_id', $userIds)->get(['user_id', 'avatar', 'nickname'])->toArray();
+        return [
+            'coaches' => $infos
+        ];
+    }
+
     /**
      * @api               {get} /api/coach/info/{uid} 获取教练信息
      * @apiGroup          内容获取
@@ -123,8 +157,8 @@ class UserCoachController extends Controller
         }
 
         foreach ($answers as &$answer) {
-            $answer['reply']    = $answer['content'];
-            $answer['question_info']    = Questions::query()->find($answer['question_id'], ['title','question_id']);
+            $answer['reply'] = $answer['content'];
+            $answer['question_info'] = Questions::query()->find($answer['question_id'], ['title', 'question_id']);
             $answer['answer_avatar'] = $coachInfo['avatar'];
             $answer['answer_nickname'] = $coachInfo['nickname'];
             unset($answer);
@@ -160,7 +194,7 @@ class UserCoachController extends Controller
      *      ],
      *   }
      */
-    public function contents(Request $request) : array
+    public function contents(Request $request): array
     {
         $uid = $request->route('uid');
         $typ = $request->route('typ');
@@ -185,7 +219,7 @@ class UserCoachController extends Controller
         }
 
         foreach ($contents as &$content) {
-            $content['reply']    = $content['content'];
+            $content['reply'] = $content['content'];
             $content['user_avatar'] = $coachInfo['avatar'];
             $content['user_nickname'] = $coachInfo['nickname'];
             unset($content);

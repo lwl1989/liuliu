@@ -13,6 +13,6 @@ use App\Models\Model;
 
 class ContentTags extends Model
 {
-    public $table = 'content_tags';
+    public $table = 'content_relation';
     public $timestamps = false;
 }
