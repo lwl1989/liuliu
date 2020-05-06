@@ -21,7 +21,7 @@ Route::group(['middleware' => ['format']], function () {
     Route::get('questions', 'Content\QuestionController@timeLime');
     Route::get('tags', 'Common\TagsController@getAll');
 
-    Route:group(['prefix'=>'topic'], function (){
+    Route::group(['prefix'=>'topic'], function (){
         Route::get('recommend','Content\TopicController@recommend');
         Route::get('info/{id}','Content\TopicController@info');
     });
