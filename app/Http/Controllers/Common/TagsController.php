@@ -78,14 +78,14 @@ class TagsController extends Controller
         $talk = [];
         $write = [];
         foreach ($tags as $tag) {
-            if($tag['typ'] == 1) {
+            if ($tag['typ'] == 1) {
                 $talk[] = $tag;
-            }else{
+            } else {
                 $write[] = $tag;
             }
         }
 
-        return ['talk' => $talk, 'write'=>$write, 'my_tags' => $myTags];
+        return ['talk' => $talk, 'write' => $write, 'my_tags' => $myTags];
     }
 
     /**
@@ -123,14 +123,14 @@ class TagsController extends Controller
         $talk = [];
         $write = [];
         foreach ($tags as $tag) {
-            if($tag['typ'] == 1) {
+            if ($tag['typ'] == 1) {
                 $talk[] = $tag;
-            }else{
+            } else {
                 $write[] = $tag;
             }
         }
 
-        return ['talk' => $talk, 'write'=>$write];
+        return ['talk' => $talk, 'write' => $write];
     }
 
     /**
@@ -158,12 +158,19 @@ class TagsController extends Controller
      */
     public function getMenu(): array
     {
-        $myTags = UserSubTags::query()
+        $subTags = UserSubTags::query()
             ->where('user_id', Auth::id())
             ->where('status', Common::STATUS_NORMAL)
-            ->orderBy('create_time', 'desc')->get();
-        if (!is_array($myTags)) {
-            $myTags = Tags::query()->where('status', Common::STATUS_NORMAL)->orderBy('sort', 'desc')->limit(6)->get();
+            ->orderBy('create_time', 'desc')->get()->toArray();
+        if (!empty($subTags)) {
+            $myTags = Tags::query()->where('status', Common::STATUS_NORMAL)
+                ->orderBy('sort', 'desc')
+                ->limit(10)->get();
+        } else {
+            $myTags = Tags::query()->where('status', Common::STATUS_NORMAL)
+                ->whereIn('id', array_column($subTags, 'tag_id'))
+                ->orderBy('sort', 'desc')
+                ->limit(10)->get();
         }
 
         array_unshift($myTags, [
@@ -216,7 +223,7 @@ class TagsController extends Controller
             foreach ($insertIds as $tagId) {
                 UserSubTags::query()->insert([
                     'user_id' => $uid,
-                    'tag_id'  => $tagId,
+                    'tag_id' => $tagId,
                     'sub_time' => date('Y-m-d H:i:s')
                 ]);
             }

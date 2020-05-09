@@ -92,7 +92,11 @@ class ContentController extends Controller
     }
 
     /**
-     * @api               {get} /api/content/{tag_id} 频道内容列表
+     * @api               {get} /api/content/ 频道内容列表
+     *
+     * @apiParam {String} tag_id
+     *  @apiParam {String} page
+     *   @apiParam {String} limit
      * @apiGroup          内容获取
      * @apiName           获取不同标签下文章内容
      *
@@ -119,7 +123,7 @@ class ContentController extends Controller
      */
     public function myList(Request $request)
     {
-        $tagId = $request->route('tag_id', 0);
+        $tagId = $request->get('tag_id', 0);
         if (!$tagId) {
             $tagId = -2;
         }

@@ -10,9 +10,9 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::get('docs', function(){
-    return View::make('docs.api.index');
-});
+//Route::get('docs', function(){
+//    return View::make('docs.api.index');
+//});
 //
 ////普通路由
 //Route::get('login','Auth\LoginController@showLoginForm')->name('login');

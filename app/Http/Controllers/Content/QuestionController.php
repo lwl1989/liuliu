@@ -64,7 +64,7 @@ class QuestionController extends Controller
     {
         $limit = $request->get('limit', 15);
         $page = $request->get('page', 1);
-        $questions = Questions::query()->where('typ',1)
+        $questions = Questions::query()->where('typ', 1)
             ->limit($limit)->offset(($page - 1) * $limit)->get();
 
         if (!empty($questions)) {
