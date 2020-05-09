@@ -13,6 +13,7 @@ use App\Exceptions\ErrorConstant;
 use App\Http\Controllers\Controller;
 use App\Library\Constant\Common;
 use App\Models\Content\ContentCounts;
+use App\Models\RegisterUsers\UserCounts;
 use App\Models\RegisterUsers\UserOpLog;
 use App\Models\RegisterUsers\UserZan;
 use Illuminate\Http\Request;
@@ -47,20 +48,26 @@ class ZanController extends Controller
         }
         DB::beginTransaction();
         $uid = Auth::id();
+        $exists = UserZan::query()->where('user_id', $uid)->where('typ', $typ)->where('obj_id', $cid)->first();
+        if (!empty($exists)) {
+            return ['code' => ErrorConstant::DATA_ERR, 'response' => '你已经点赞过了'];
+        }
         try {
             DB::commit();
             $opTyp = Common::USER_OP_ZAN;
+            UserZan::query()->insert([
+                'user_id' => $uid,
+                'obj_id' => $cid,
+                'typ' => $typ
+            ]);
             ContentCounts::incrementOrCreate($cid, $opTyp);
+            UserCounts::incrementOrCreate($uid, $opTyp);
             UserOpLog::query()->insert([
                 'user_id' => $uid,
                 'op_typ_id' => $cid,
                 'typ' => $opTyp
             ]);
-            UserZan::query()->insert([
-                'user_id'   =>  $uid,
-                'obj_id'    =>  $cid,
-                'typ'       =>  $typ
-            ]);
+
             return ['id' => $cid];
         } catch (\Exception $e) {
             DB::rollBack();
@@ -103,6 +110,7 @@ class ZanController extends Controller
             DB::commit();
             $opTyp = Common::USER_OP_ZAN;
             ContentCounts::incrementOrCreate($cid, $opTyp, -1);
+            UserCounts::incrementOrCreate($uid, $opTyp, -1);
             UserZan::query()->where('id', $exists->id)->delete();
             return ['id' => $cid];
         } catch (\Exception $e) {

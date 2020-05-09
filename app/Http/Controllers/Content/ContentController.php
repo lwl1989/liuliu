@@ -141,7 +141,6 @@ class ContentController extends Controller
             default:
                 //todo:先期每个条目最多200条，没那么多人划那么多条，按发布时间逆序即可
                 $contentBind = ContentTags::query()->where('relation_id', $tagId)->where('typ', 1)->orderBy('id', 'desc')->limit(200)->get()->toArray();
-
                 if (!empty($contentBind)) {
                     $contentIds = array_column($contentBind, 'content_id');
                     $result = ContentService::getContentListView($contentIds, ($page - 1) * $limit, $limit);
@@ -184,8 +183,10 @@ class ContentController extends Controller
                 'parent_id' => $pid,
                 'content' => $content,
             ]);
+
             $typ = Common::USER_OP_COMMENT;
             ContentCounts::incrementOrCreate($cid, $typ);
+            UserCounts::incrementOrCreate($uid, $typ);
             UserOpLog::query()->insert([
                 'user_id' => $uid,
                 'op_typ_id' => $cid,
@@ -193,6 +194,7 @@ class ContentController extends Controller
             ]);
             return ['id' => $cid];
         } catch (\Exception $e) {
+            var_dump($e);
             DB::rollBack();
             return ['code' => ErrorConstant::SYSTEM_ERR, 'response' => $e->getMessage()];
         }

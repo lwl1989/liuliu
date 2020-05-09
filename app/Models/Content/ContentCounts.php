@@ -19,15 +19,16 @@ class ContentCounts extends Model
 
     public static function incrementOrCreate($cid, int $typ, int $amount = 1)
     {
-        $exists = ContentCounts::query()->where('content_id', $cid)->where('typ', $typ)->first('id');
+        $exists = ContentCounts::query()->where('content_id', $cid)->where('typ', $typ)->first(['id']);
+       // var_dump($exists, $cid, $typ);
         if (!empty($exists)) {
+            ContentCounts::query()->where('content_id', $cid)->where('typ', $typ)->increment('counts', $amount);
+        } else {
             ContentCounts::query()->insert([
                 'content_id' => $cid,
                 'counts' => $amount,
                 'typ' => $typ
             ]);
-        } else {
-            ContentCounts::query()->where('content_id', $cid)->where('typ', $typ)->increment('counts', $amount);
         }
     }
 
