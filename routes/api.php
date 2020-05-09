@@ -43,7 +43,7 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
     Route::group(['prefix' => 'content'],function (){
         Route::post('comment', 'Content\ContentController@comment');
         Route::post('release', 'Content\ContentController@release');
-        Route::post('/', 'Content\ContentController@myList');
+        Route::get('/', 'Content\ContentController@myList');
 
         Route::post('zan', 'Content\ZanController@zan');
         Route::post('unzan', 'Content\ZanController@unZan');
