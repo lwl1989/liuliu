@@ -13,6 +13,16 @@ class Controller extends BaseController
         return [];
     }
 
+    /**
+     * @api               {get} /api/webhook 测试webhook
+     * @apiGroup          webhook
+     * @apiName           webhook
+     * @apiVersion        1.0.0
+     *
+     * @apiSuccessExample Success-Response
+     * []
+     *
+     */
     public function webHook() : array {
 
         $secret = env('HOOK_GIT','');
