@@ -7,6 +7,7 @@ use App\Exceptions\ErrorConstant;
 use App\Http\Controllers\Controller;
 use App\Library\Constant\Common;
 use App\Models\Content\Content;
+use App\Models\Content\ContentComment;
 use App\Models\Content\ContentCounts;
 use App\Models\RegisterUsers\UserCoach;
 use App\Models\RegisterUsers\UserCounts;
@@ -86,7 +87,7 @@ class UsersController extends Controller
         ];
     }
     /**
-     * @api               {get} /api/user/follows 我关注的教练
+     * @api               {get} /api/user/follows/{uid} 我关注的教练
      * @apiGroup          内容获取
      * @apiName           我关注的教练
      * @apiVersion        1.0.0
@@ -107,7 +108,7 @@ class UsersController extends Controller
      */
     public function follows(Request $request): array
     {
-        $uid = Auth::id();
+        $uid = $request->route('uid');
 
         $relations = UserRelations::query()
             ->where('user_id', $uid)
@@ -127,7 +128,7 @@ class UsersController extends Controller
     }
 
     /**
-     * @api               {get} /api/user/contents 我的feed流
+     * @api               {get} /api/user/contents/{uid} 我的feed流
      * @apiGroup          内容获取
      * @apiName           我的feed流
      * @apiVersion        1.0.0
@@ -159,7 +160,7 @@ class UsersController extends Controller
      */
     public function contents(Request $request): array
     {
-        $uid = Auth::id();
+        $uid = $request->route('uid');
 
         $relations = UserRelations::query()
             ->where('user_id', $uid)
@@ -286,5 +287,46 @@ class UsersController extends Controller
             }
         }
         return [];
+    }
+
+    /**
+     * @api               {get} /api/user/comments/:uid 评论文章
+     * @apiGroup          内容操作
+     * @apiName           评论文章
+     *
+     * @apiParam {String} content
+     * @apiParam {String} cid  文章id
+     * @apiParam {String} pid  上一层评论id，第一层为0
+     * @apiVersion        1.0.0
+     *
+     * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     */
+    /**
+     * @param Request $request
+     * @return array
+     */
+    public function comments(Request $request) : array
+    {
+        $uid = $request->route('uid');
+        //todo: 第二级评论回复不展示
+        $comment = ContentComment::query()->where('user_id',$uid)->where('parent_id', 0)->get()->toArray();
+        $result = [];
+        if(!empty($comment)) {
+            $contentIds = array_column($comment, 'content_id');
+
+            $contents = Content::query()->whereIn('id', $contentIds)->get()->toArray();
+            $contents = ContentCounts::getContentsCounts($contents);
+            $contents = UserInfo::getUserInfoWithList($contents);
+            $contents = array_column($contents, null, 'id');
+            foreach ($comment as $item) {
+                $result[] = [
+                    'comment'   =>  $item,
+                    'content'   =>  $contents[$item['content_id']]
+                ];
+            }
+        }
+
+        return $result;
     }
 }
