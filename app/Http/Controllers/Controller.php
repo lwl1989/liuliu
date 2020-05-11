@@ -12,4 +12,22 @@ class Controller extends BaseController
     public function index(){
         return [];
     }
+
+    public function webHook() : array {
+
+        $secret = env('HOOK_GIT','');
+
+        $signature = $_SERVER['HTTP_X_HUB_SIGNATURE'];
+
+        if ($signature) {
+            $hash = "sha1=".hash_hmac('sha1', file_get_contents("php://input"), $secret);
+            if (strcmp($signature, $hash) == 0) {
+                echo shell_exec("cd .. && git pull && apidoc -i app/Http/Controllers -o public/api");
+                exit();
+            }
+        }
+
+
+            return [];
+    }
 }

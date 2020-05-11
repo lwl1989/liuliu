@@ -12,6 +12,8 @@
 */
 
 Route::group(['middleware' => ['format']], function () {
+
+    Route::get('webhook','Controller@hook');
     Route::get('wx/login','Auth\WxController@login');
     Route::get('wx/token','Auth\WxController@getToken');
 
