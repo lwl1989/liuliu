@@ -13,7 +13,7 @@
 
 Route::group(['middleware' => ['format']], function () {
 
-    Route::get('webhook','Controller@hook');
+    Route::get('webhook','Controller@webHook');
     Route::get('wx/login','Auth\WxController@login');
     Route::get('wx/token','Auth\WxController@getToken');
 
