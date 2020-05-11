@@ -22,7 +22,8 @@ class Controller extends BaseController
         if ($signature) {
             $hash = "sha1=".hash_hmac('sha1', file_get_contents("php://input"), $secret);
             if (strcmp($signature, $hash) == 0) {
-                echo shell_exec("cd .. && git pull && apidoc -i app/Http/Controllers -o public/api");
+                $path = env('BASH_PATH', '/var/www/html');
+                echo shell_exec('cd '.$path.' && git pull && apidoc -i app/Http/Controllers -o public/api');
                 exit();
             }
         }
