@@ -21,7 +21,7 @@ class UserCounts extends Model
 
     public static function incrementOrCreate($uid, int $typ, int $amount = 1)
     {
-        $exists = UserCounts::query()->where('user_id', $uid)->where('typ', $typ)->first('id');
+        $exists = UserCounts::query()->where('user_id', $uid)->where('typ', $typ)->first(['id']);
         if (!empty($exists)) {
             UserCounts::query()->insert([
                 'user_id' => $uid,
