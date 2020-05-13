@@ -230,7 +230,7 @@ class QuestionController extends Controller
         unset($params['qid']);
         $uid = Auth::id();
         $params['user_id'] = $uid;
-        $question = Questions::query()->first($params['question_id']);
+        $question = Questions::query()->where('id', $params['question_id'])->first();
         if(!$question || $question->status != Common::STATUS_NORMAL) {
             return ['code' => ErrorConstant::DATA_ERR, 'response' => '此问题不存在'];
         }
