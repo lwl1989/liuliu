@@ -65,7 +65,7 @@ class QuestionController extends Controller
         $limit = $request->get('limit', 15);
         $page = $request->get('page', 1);
         $questions = Questions::query()->where('typ', 1)
-            ->limit($limit)->offset(($page - 1) * $limit)->get();
+            ->limit($limit)->offset(($page - 1) * $limit)->get()->toArray();
 
         if (!empty($questions)) {
             $userIds = array_column($questions, 'user_id');
