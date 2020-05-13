@@ -20,7 +20,7 @@ Route::group(['middleware' => ['format']], function () {
 
 
     Route::get('question/info/{id}', 'Content\QuestionController@info');
-    Route::get('questions', 'Content\QuestionController@timeLime');
+    Route::get('questions', 'Content\QuestionController@timeLine');
     Route::get('tags', 'Common\TagsController@getAll');
 
     Route::group(['prefix'=>'topic'], function (){
