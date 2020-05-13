@@ -13,6 +13,7 @@ use App\Exceptions\ErrorConstant;
 use App\Http\Controllers\Controller;
 use App\Library\ArrayParse;
 use App\Library\Constant\Common;
+use App\Models\Content\ContentCounts;
 use App\Models\Question\QuestionAppoint;
 use App\Models\Question\QuestionReply;
 use App\Models\Question\Questions;
@@ -198,6 +199,59 @@ class QuestionController extends Controller
             ]);
             DB::commit();
             return ['id' => $qid];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return ['code' => ErrorConstant::SYSTEM_ERR, 'response' => $e->getMessage()];
+        }
+    }
+
+
+    /**
+     * @api               {post} /api/question/answer 回答问题
+     * @apiGroup          内容操作
+     * @apiName           发布问题
+     *
+     * @apiParam {String} qid  问题id
+     * @apiParam {String} content  回答内容
+     * @apiVersion        1.0.0
+     *
+     * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     */
+    /**
+     * @param Request $request
+     * @return array
+     * @throws
+     */
+    public function answer(Request $request) : array
+    {
+        $params = ArrayParse::checkParamsArray(['qid', 'content'], $request->input());
+        $params['question_id'] = $params['qid'];
+        unset($params['qid']);
+        $uid = Auth::id();
+        $params['user_id'] = $uid;
+        $question = Questions::query()->first($params['question_id']);
+        if(!$question || $question->status != Common::STATUS_NORMAL) {
+            return ['code' => ErrorConstant::DATA_ERR, 'response' => '此问题不存在'];
+        }
+        if($question->answer_id != 0 and $question->answer_id != $uid) {
+            return ['code' => ErrorConstant::UN_AUTH_ERROR, 'response' => '此问题是私有问题'];
+        }
+
+        DB::beginTransaction();
+        try {
+            $aid = QuestionReply::query()->insertGetId($params);
+
+            $typ = Common::USER_OP_ANSWER;
+            ContentCounts::incrementOrCreate($params['question_id'], $typ);
+            UserCounts::incrementOrCreate($uid, $typ);
+            UserOpLog::query()->insert([
+                'user_id' => $uid,
+                'op_typ_id' => $aid,
+                'typ' => $typ
+            ]);
+            DB::commit();
+            return ['id' => $aid];
         } catch (\Exception $e) {
             DB::rollBack();
             return ['code' => ErrorConstant::SYSTEM_ERR, 'response' => $e->getMessage()];

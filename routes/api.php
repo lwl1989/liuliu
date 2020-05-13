@@ -53,6 +53,7 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
 
     Route::group(['prefix' => 'question'],function (){
         Route::post('release', 'Content\QuestionController@release');
+        Route::post('answer', 'Content\QuestionController@answer');
     });
 
     Route::group(['prefix' => 'user'],function (){
