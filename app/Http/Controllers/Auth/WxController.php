@@ -57,6 +57,7 @@ class WxController extends Controller
 
         $userInfo = $this->wxxcx->getLoginInfo($code);
         if (!isset($userInfo['openid'])) {
+            log('code =?', $code);
             return ['code' => ErrorConstant::DATA_ERR, 'response' => 'verify error'];
         }
         $exists = UserBind::query()->where('open_id', $userInfo['openid'])->first(['id']);
