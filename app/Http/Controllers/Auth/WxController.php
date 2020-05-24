@@ -19,12 +19,12 @@ use Iwanli\Wxxcx\Wxxcx;
 
 class WxController extends Controller
 {
-    protected $wxxcx;
-
-    function __construct(Wxxcx $wxxcx)
-    {
-        $this->wxxcx = $wxxcx;
-    }
+//    protected $wxxcx;
+//
+//    function __construct(Wxxcx $wxxcx)
+//    {
+//        $this->wxxcx = $wxxcx;
+//    }
 
 
     /**
@@ -55,8 +55,9 @@ class WxController extends Controller
         $encryptedData = request('encryptedData', '');
         $iv = request('iv', '');
 
-        $userInfo = $this->wxxcx->getLoginInfo($code);
-        logger('userInfo = ?', $userInfo);
+        $wxxcx = new Wxxcx();
+        $userInfo = $wxxcx->getLoginInfo($code);
+        logger('userInfo = ? code = '.config('wxxcx.appid',''), $userInfo);
         if (!isset($userInfo['openid'])) {
             //logger('code =?'.$code );
             return ['code' => ErrorConstant::DATA_ERR, 'response' => $userInfo];
