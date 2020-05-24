@@ -60,10 +60,10 @@ class WxController extends Controller
         }
         $wxxcx = new Wxxcx();
         $userInfo = $wxxcx->getLoginInfo($code);
-        Log::debug('userInfo = ? code = ' . config('wxxcx.appid', ''), $userInfo);
+        Log::debug('userInfo = ? code = ' . config('wxxcx.appid', ''), is_array($userInfo)?$userInfo:[]);
         //logger('userInfo = ? code = ' . config('wxxcx.appid', ''), $userInfo);
         if (!isset($userInfo['openid'])) {
-            Log::debug('code =?'.$code );
+            Log::debug('code =?'.$code, []);
             return ['code' => ErrorConstant::DATA_ERR, 'response' => $userInfo];
         }
         $exists = UserBind::query()->where('open_id', $userInfo['openid'])->first(['id']);
@@ -79,7 +79,8 @@ class WxController extends Controller
                 'open_id' => $userInfo['openid']
             ]);
             $result = $wxxcx->getUserInfo($encryptedData, $iv);
-            Log::debug('userinfo', $result);
+            $result = json_decode($result, true);
+            Log::debug('userinfo', is_array($result)?$result:[]);
             if (is_array($result)) {
                 $user = $result;
                 //获取解密后的用户信息
