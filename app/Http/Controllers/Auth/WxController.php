@@ -19,23 +19,23 @@ use Iwanli\Wxxcx\Wxxcx;
 
 class WxController extends Controller
 {
-//    protected $wxxcx;
-//
-//    function __construct(Wxxcx $wxxcx)
-//    {
-//        $this->wxxcx = $wxxcx;
-//    }
+    //    protected $wxxcx;
+    //
+    //    function __construct(Wxxcx $wxxcx)
+    //    {
+    //        $this->wxxcx = $wxxcx;
+    //    }
 
 
     /**
-     * @api {get} /api/wx/login 微信登录并自动注册(wx小程序回调)
-     * @apiGroup 登录
-     * @apiName login
+     * @api               {get} /api/wx/login 微信登录并自动注册(wx小程序回调)
+     * @apiGroup          登录
+     * @apiName           login
      *
      * @apiParam {String} code
      * @apiParam {String} encryptedData
      * @apiParam {String} iv
-     * @apiVersion 1.0.0
+     * @apiVersion        1.0.0
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
@@ -57,7 +57,7 @@ class WxController extends Controller
 
         $wxxcx = new Wxxcx();
         $userInfo = $wxxcx->getLoginInfo($code);
-        logger('userInfo = ? code = '.config('wxxcx.appid',''), $userInfo);
+        logger('userInfo = ? code = ' . config('wxxcx.appid', ''), $userInfo);
         if (!isset($userInfo['openid'])) {
             //logger('code =?'.$code );
             return ['code' => ErrorConstant::DATA_ERR, 'response' => $userInfo];
@@ -71,27 +71,28 @@ class WxController extends Controller
             ]);
             UserBind::query()->insert([
                 'user_id' => $uid,
-                'typ' => 3
+                'typ' => 3,
+                'open_id' => $userInfo['openid']
             ]);
-            $result = $this->wxxcx->getUserInfo($encryptedData, $iv);
+            $result = $wxxcx->getUserInfo($encryptedData, $iv);
             if (is_array($result)) {
                 $user = $result;
                 //获取解密后的用户信息
 
-//        {
-//            "openId": "OPENID",
-//  "nickName": "NICKNAME",
-//  "gender": GENDER,
-//  "city": "CITY",
-//  "province": "PROVINCE",
-//  "country": "COUNTRY",
-//  "avatarUrl": "AVATARURL",
-//  "unionId": "UNIONID",
-//  "watermark": {
-//            "appid":"APPID",
-//    "timestamp":TIMESTAMP
-//  }
-//}
+                //        {
+                //            "openId": "OPENID",
+                //  "nickName": "NICKNAME",
+                //  "gender": GENDER,
+                //  "city": "CITY",
+                //  "province": "PROVINCE",
+                //  "country": "COUNTRY",
+                //  "avatarUrl": "AVATARURL",
+                //  "unionId": "UNIONID",
+                //  "watermark": {
+                //            "appid":"APPID",
+                //    "timestamp":TIMESTAMP
+                //  }
+                //}
                 UserInfo::query()->insert([
                     'nickname' => $result['nickName'],
                     'gender' => $result['gender'],
@@ -107,12 +108,14 @@ class WxController extends Controller
             $user = UserInfo::query()->where('user_id', $uid)->first()->toArray();
         }
 
-        $encrypt = Encrypt::getLoginResult(['uid' => $uid, 'device_uuid' => $userInfo['openid']]);
+        //todo: device_uuid => session_key
+        $encrypt = Encrypt::getLoginResult(['uid' => $uid, 'device_uuid' => $userInfo['session_key']]);
 
         $user['id'] = $uid;
         return [
             'token' => $encrypt['token'],
-            'user' => $user
+            'user' => $user,
+            'session_key' => $userInfo['session_key']
         ];
     }
 
