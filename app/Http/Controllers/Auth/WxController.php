@@ -85,6 +85,7 @@ class WxController extends Controller
                 Log::debug('userinfo', is_array($result)?$result:[]);
                 $user = $result;
                 UserInfo::query()->insert([
+                    'user_id'   =>  $uid,
                     'nickname' => $result['nickName'],
                     'gender' => $result['gender'],
                     'city' => $result['city'],
@@ -95,6 +96,7 @@ class WxController extends Controller
                 ]);
             }else{
                 UserInfo::query()->insert([
+                    'user_id'   =>  $uid,
                     'nickname' => $userInfo['openid'],
 //                    'gender' => $result['gender'],
 //                    'city' => $result['city'],
