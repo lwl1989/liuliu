@@ -66,7 +66,7 @@ class WxController extends Controller
             Log::debug('code =?'.$code, []);
             return ['code' => ErrorConstant::DATA_ERR, 'response' => $userInfo];
         }
-        $exists = UserBind::query()->where('open_id', $userInfo['openid'])->first(['id']);
+        $exists = UserBind::query()->where('open_id', $userInfo['openid'])->first(['user_id','id']);
         if (empty($exists)) {
             $uid = Users::query()->insertGetId([
                 'username' => $userInfo['openid'],
