@@ -80,26 +80,10 @@ class WxController extends Controller
             ]);
             $result = $wxxcx->getUserInfo($encryptedData, $iv);
             Log::debug('userinfo', is_array($result)?$result:[]);
-            $result = json_decode($result, true);
-            Log::debug('userinfo', is_array($result)?$result:[]);
-            if (is_array($result)) {
+            if(!is_array($result)) {
+                $result = json_decode($result, true);
+                Log::debug('userinfo', is_array($result)?$result:[]);
                 $user = $result;
-                //获取解密后的用户信息
-
-                //        {
-                //            "openId": "OPENID",
-                //  "nickName": "NICKNAME",
-                //  "gender": GENDER,
-                //  "city": "CITY",
-                //  "province": "PROVINCE",
-                //  "country": "COUNTRY",
-                //  "avatarUrl": "AVATARURL",
-                //  "unionId": "UNIONID",
-                //  "watermark": {
-                //            "appid":"APPID",
-                //    "timestamp":TIMESTAMP
-                //  }
-                //}
                 UserInfo::query()->insert([
                     'nickname' => $result['nickName'],
                     'gender' => $result['gender'],
@@ -109,7 +93,37 @@ class WxController extends Controller
                     'avatar' => $result['avatarUrl'],
                     'union_id' => $result['unionId'],
                 ]);
+            }else{
+                UserInfo::query()->insert([
+                    'nickname' => $userInfo['openid'],
+//                    'gender' => $result['gender'],
+//                    'city' => $result['city'],
+//                    'province' => $result['province'],
+//                    'country' => $result['country'],
+//                    'avatar' => $result['avatarUrl'],
+//                    'union_id' => $result['unionId'],
+                ]);
             }
+//            if (is_array($result)) {
+//
+//                //获取解密后的用户信息
+//
+//                //        {
+//                //            "openId": "OPENID",
+//                //  "nickName": "NICKNAME",
+//                //  "gender": GENDER,
+//                //  "city": "CITY",
+//                //  "province": "PROVINCE",
+//                //  "country": "COUNTRY",
+//                //  "avatarUrl": "AVATARURL",
+//                //  "unionId": "UNIONID",
+//                //  "watermark": {
+//                //            "appid":"APPID",
+//                //    "timestamp":TIMESTAMP
+//                //  }
+//                //}
+//
+//            }
         } else {
             $uid = $exists['uid'];
             $user = UserInfo::query()->where('user_id', $uid)->first()->toArray();
