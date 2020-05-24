@@ -56,7 +56,7 @@ class WxController extends Controller
         $iv = request('iv', '');
 
         $userInfo = $this->wxxcx->getLoginInfo($code);
-        logger('userInfo = ?', json_encode($userInfo));
+        logger('userInfo = ?', $userInfo);
         if (!isset($userInfo['openid'])) {
             //logger('code =?'.$code );
             return ['code' => ErrorConstant::DATA_ERR, 'response' => $userInfo];
