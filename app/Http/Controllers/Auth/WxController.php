@@ -15,6 +15,7 @@ use App\Models\RegisterUsers\UserBind;
 use App\Models\RegisterUsers\UserInfo;
 use App\Models\RegisterUsers\Users;
 use App\Models\RegisterUsers\UserThird;
+use Illuminate\Support\Facades\Log;
 use Iwanli\Wxxcx\Wxxcx;
 
 class WxController extends Controller
@@ -54,12 +55,15 @@ class WxController extends Controller
         $code = request('code', '');
         $encryptedData = request('encryptedData', '');
         $iv = request('iv', '');
-
+        if(empty($code) || empty($encryptedData) || empty($iv)) {
+            return ['code' => ErrorConstant::DATA_ERR, 'response' => 'params lost'];
+        }
         $wxxcx = new Wxxcx();
         $userInfo = $wxxcx->getLoginInfo($code);
-        logger('userInfo = ? code = ' . config('wxxcx.appid', ''), $userInfo);
+        Log::debug('userInfo = ? code = ' . config('wxxcx.appid', ''), $userInfo);
+        //logger('userInfo = ? code = ' . config('wxxcx.appid', ''), $userInfo);
         if (!isset($userInfo['openid'])) {
-            //logger('code =?'.$code );
+            Log::debug('code =?'.$code );
             return ['code' => ErrorConstant::DATA_ERR, 'response' => $userInfo];
         }
         $exists = UserBind::query()->where('open_id', $userInfo['openid'])->first(['id']);
@@ -75,6 +79,7 @@ class WxController extends Controller
                 'open_id' => $userInfo['openid']
             ]);
             $result = $wxxcx->getUserInfo($encryptedData, $iv);
+            Log::debug('userinfo', $result);
             if (is_array($result)) {
                 $user = $result;
                 //获取解密后的用户信息
