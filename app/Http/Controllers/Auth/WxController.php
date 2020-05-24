@@ -56,9 +56,9 @@ class WxController extends Controller
         $iv = request('iv', '');
 
         $userInfo = $this->wxxcx->getLoginInfo($code);
-        log('userInfo = ?', json_encode($userInfo));
+        logger('userInfo = ?', json_encode($userInfo));
         if (!isset($userInfo['openid'])) {
-            log('code =?', $code);
+            //logger('code =?'.$code );
             return ['code' => ErrorConstant::DATA_ERR, 'response' => $userInfo];
         }
         $exists = UserBind::query()->where('open_id', $userInfo['openid'])->first(['id']);
