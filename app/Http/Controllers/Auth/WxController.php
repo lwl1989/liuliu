@@ -79,6 +79,7 @@ class WxController extends Controller
                 'open_id' => $userInfo['openid']
             ]);
             $result = $wxxcx->getUserInfo($encryptedData, $iv);
+            Log::debug('userinfo', is_array($result)?$result:[]);
             $result = json_decode($result, true);
             Log::debug('userinfo', is_array($result)?$result:[]);
             if (is_array($result)) {
