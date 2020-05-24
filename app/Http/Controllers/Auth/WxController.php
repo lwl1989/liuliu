@@ -127,7 +127,7 @@ class WxController extends Controller
 //
 //            }
         } else {
-            $uid = $exists['uid'];
+            $uid = $exists['user_id'];
             $user = UserInfo::query()->where('user_id', $uid)->first()->toArray();
         }
 
