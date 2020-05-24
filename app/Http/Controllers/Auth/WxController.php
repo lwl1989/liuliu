@@ -91,7 +91,7 @@ class WxController extends Controller
                     'province' => $result['province'],
                     'country' => $result['country'],
                     'avatar' => $result['avatarUrl'],
-                    'union_id' => $result['unionId'],
+                    'union_id' => $result['unionId'] ?: '',
                 ]);
             }else{
                 UserInfo::query()->insert([
