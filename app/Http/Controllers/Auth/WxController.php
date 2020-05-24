@@ -59,7 +59,7 @@ class WxController extends Controller
         log('userInfo = ?', json_encode($userInfo));
         if (!isset($userInfo['openid'])) {
             log('code =?', $code);
-            return ['code' => ErrorConstant::DATA_ERR, 'response' => 'verify error'];
+            return ['code' => ErrorConstant::DATA_ERR, 'response' => $userInfo];
         }
         $exists = UserBind::query()->where('open_id', $userInfo['openid'])->first(['id']);
         if (empty($exists)) {
