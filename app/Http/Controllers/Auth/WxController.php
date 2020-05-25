@@ -66,6 +66,14 @@ class WxController extends Controller
             Log::debug('code =?'.$code, []);
             return ['code' => ErrorConstant::DATA_ERR, 'response' => $userInfo];
         }
+        $result = $wxxcx->getUserInfo($encryptedData, $iv);
+        Log::debug('userinfo', is_array($result)?$result:[]);
+        $result1 = $wxxcx->getUserInfo(urldecode($encryptedData), urldecode($iv));
+        Log::debug('userinfo', is_array($result1)?$result1:[]);
+        return [
+            'user' => $result,'dasd'=>$result1,
+            'session_key' => $userInfo['session_key']
+        ];
         $exists = UserBind::query()->where('open_id', $userInfo['openid'])->first(['user_id','id']);
         if (empty($exists)) {
             $uid = Users::query()->insertGetId([
