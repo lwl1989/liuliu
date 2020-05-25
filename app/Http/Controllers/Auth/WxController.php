@@ -42,7 +42,9 @@ class WxController extends Controller
      *     HTTP/1.1 200 OK
      *     {
      *       "token": "session验证str",
-     *       "user": {//用户信息}
+     *       "user": {//用户信息},
+     *       "session_key":"微信sessionKey",
+     *
      *     }
      */
     /**
