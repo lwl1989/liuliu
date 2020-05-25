@@ -112,6 +112,7 @@ class WxController extends Controller
                 DB::commit();
             } catch (\Exception $e) {
                 DB::rollBack();
+                return ['code'=>ErrorConstant::SYSTEM_ERR,'response'=>$e->getMessage()];
             }
 
         } else {
