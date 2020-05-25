@@ -53,7 +53,7 @@ class Wxxcx
         $decodeData = "";
         Log::debug('message', [$encryptedData, $iv, $decodeData]);
         $errCode = $pc->decryptData($encryptedData, $iv, $decodeData);
-        Log::debug('errorCode', [$errCode]);
+        Log::debug('errorCode', []);
         if ($errCode !=0 ) {
             return [
                 'code' => 10001,

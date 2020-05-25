@@ -65,15 +65,15 @@ class WxController extends Controller
             Log::debug('code =?'.$code, []);
             return ['code' => ErrorConstant::DATA_ERR, 'response' => $userInfo];
         }
-        $result = $wxxcx->getUserInfo($encryptedData, $iv);
-        Log::debug('userinfo', is_array($result)?$result:[]);
-        $result1 = $wxxcx->getUserInfo(urldecode($encryptedData), urldecode($iv));
-        Log::debug('userinfo1', is_array($result1)?$result1:[]);
-        return [
-            'ws'=>$wxxcx,
-            'user' => $result,'dasd'=>$result1,
-            'session_key' => $userInfo['session_key']
-        ];
+//        $result = $wxxcx->getUserInfo($encryptedData, $iv);
+//        Log::debug('userinfo', is_array($result)?$result:[]);
+//        $result1 = $wxxcx->getUserInfo(urldecode($encryptedData), urldecode($iv));
+//        Log::debug('userinfo1', is_array($result1)?$result1:[]);
+//        return [
+//            'ws'=>$wxxcx,
+//            'user' => $result,
+//            'session_key' => $userInfo['session_key']
+//        ];
         $exists = UserBind::query()->where('open_id', $userInfo['openid'])->first(['user_id','id']);
         if (empty($exists)) {
             $uid = Users::query()->insertGetId([
@@ -90,7 +90,7 @@ class WxController extends Controller
             Log::debug('userinfo', is_array($result)?$result:[]);
             if(!is_array($result)) {
                 $result = json_decode($result, true);
-                Log::debug('userinfo', is_array($result)?$result:[]);
+                Log::debug('userinfo', is_array($result)?$result:[$result]);
                 $user = $result;
                 UserInfo::query()->insert([
                     'user_id'   =>  $uid,
