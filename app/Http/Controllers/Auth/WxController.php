@@ -14,9 +14,8 @@ use App\Library\Auth\Encrypt;
 use App\Models\RegisterUsers\UserBind;
 use App\Models\RegisterUsers\UserInfo;
 use App\Models\RegisterUsers\Users;
-use App\Models\RegisterUsers\UserThird;
 use Illuminate\Support\Facades\Log;
-use Iwanli\Wxxcx\Wxxcx;
+use App\Library\Wxxcx;
 
 class WxController extends Controller
 {
@@ -71,6 +70,7 @@ class WxController extends Controller
         $result1 = $wxxcx->getUserInfo(urldecode($encryptedData), urldecode($iv));
         Log::debug('userinfo', is_array($result1)?$result1:[]);
         return [
+            'ws'=>$wxxcx,
             'user' => $result,'dasd'=>$result1,
             'session_key' => $userInfo['session_key']
         ];
