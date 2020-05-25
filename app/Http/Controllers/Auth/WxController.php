@@ -68,7 +68,7 @@ class WxController extends Controller
         $result = $wxxcx->getUserInfo($encryptedData, $iv);
         Log::debug('userinfo', is_array($result)?$result:[]);
         $result1 = $wxxcx->getUserInfo(urldecode($encryptedData), urldecode($iv));
-        Log::debug('userinfo', is_array($result1)?$result1:[]);
+        Log::debug('userinfo1', is_array($result1)?$result1:[]);
         return [
             'ws'=>$wxxcx,
             'user' => $result,'dasd'=>$result1,
