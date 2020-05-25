@@ -14,6 +14,7 @@ use App\Library\Auth\Encrypt;
 use App\Models\RegisterUsers\UserBind;
 use App\Models\RegisterUsers\UserInfo;
 use App\Models\RegisterUsers\Users;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Library\Wxxcx;
 
@@ -54,86 +55,65 @@ class WxController extends Controller
         $code = request('code', '');
         $encryptedData = request('encryptedData', '');
         $iv = request('iv', '');
-        if(empty($code) || empty($encryptedData) || empty($iv)) {
+        if (empty($code) || empty($encryptedData) || empty($iv)) {
             return ['code' => ErrorConstant::DATA_ERR, 'response' => 'params lost'];
         }
         $wxxcx = new Wxxcx();
         $userInfo = $wxxcx->getLoginInfo($code);
-        Log::debug('userInfo = ? code = ' . config('wxxcx.appid', ''), is_array($userInfo)?$userInfo:[]);
+        Log::debug('userInfo = ? code = ' . config('wxxcx.appid', ''), is_array($userInfo) ? $userInfo : []);
         //logger('userInfo = ? code = ' . config('wxxcx.appid', ''), $userInfo);
         if (!isset($userInfo['openid'])) {
-            Log::debug('code =?'.$code, []);
+            Log::debug('code =?' . $code, []);
             return ['code' => ErrorConstant::DATA_ERR, 'response' => $userInfo];
         }
-//        $result = $wxxcx->getUserInfo($encryptedData, $iv);
-//        Log::debug('userinfo', is_array($result)?$result:[]);
-//        $result1 = $wxxcx->getUserInfo(urldecode($encryptedData), urldecode($iv));
-//        Log::debug('userinfo1', is_array($result1)?$result1:[]);
-//        return [
-//            'ws'=>$wxxcx,
-//            'user' => $result,
-//            'session_key' => $userInfo['session_key']
-//        ];
-        $exists = UserBind::query()->where('open_id', $userInfo['openid'])->first(['user_id','id']);
+        //        $result = $wxxcx->getUserInfo($encryptedData, $iv);
+        //        Log::debug('userinfo', is_array($result)?$result:[]);
+        //        $result1 = $wxxcx->getUserInfo(urldecode($encryptedData), urldecode($iv));
+        //        Log::debug('userinfo1', is_array($result1)?$result1:[]);
+        //        return [
+        //            'ws'=>$wxxcx,
+        //            'user' => $result,
+        //            'session_key' => $userInfo['session_key']
+        //        ];
+        $exists = UserBind::query()->where('open_id', $userInfo['openid'])->first(['user_id', 'id']);
         if (empty($exists)) {
-            $uid = Users::query()->insertGetId([
-                'username' => $userInfo['openid'],
-                'password' => '',
-                'typ' => 3 //wechat
-            ]);
-            UserBind::query()->insert([
-                'user_id' => $uid,
-                'typ' => 3,
-                'open_id' => $userInfo['openid']
-            ]);
-            $result = $wxxcx->getUserInfo($encryptedData, $iv);
-            Log::debug('userinfo', is_array($result)?$result:[]);
-            if(!is_array($result)) {
-                $result = json_decode($result, true);
-                Log::debug('userinfo', is_array($result)?$result:[$result]);
-                $user = $result;
-                UserInfo::query()->insert([
-                    'user_id'   =>  $uid,
-                    'nickname' => $result['nickName'],
-                    'gender' => $result['gender'],
-                    'city' => $result['city'],
-                    'province' => $result['province'],
-                    'country' => $result['country'],
-                    'avatar' => $result['avatarUrl'],
-                    //'union_id' => $result['unionId'] ?: '',
+
+            DB::beginTransaction();
+            try {
+                $uid = Users::query()->insertGetId([
+                    'username' => $userInfo['openid'],
+                    'password' => '',
+                    'typ' => 3 //wechat
                 ]);
-            }else{
-                UserInfo::query()->insert([
-                    'user_id'   =>  $uid,
-                    'nickname' => $userInfo['openid'],
-//                    'gender' => $result['gender'],
-//                    'city' => $result['city'],
-//                    'province' => $result['province'],
-//                    'country' => $result['country'],
-//                    'avatar' => $result['avatarUrl'],
-//                    'union_id' => $result['unionId'],
+                UserBind::query()->insert([
+                    'user_id' => $uid,
+                    'typ' => 3,
+                    'open_id' => $userInfo['openid']
                 ]);
+                $result = $wxxcx->getUserInfo($encryptedData, $iv);
+                Log::debug('userinfo', is_array($result) ? $result : [$result]);
+                if (is_string($result)) {
+                    $result = json_decode($result, true);
+
+                    $user = $result;
+                    UserInfo::query()->insert([
+                        'user_id' => $uid,
+                        'nickname' => $result['nickName'],
+                        'gender' => $result['gender'],
+                        'city' => $result['city'],
+                        'province' => $result['province'],
+                        'country' => $result['country'],
+                        'avatar' => $result['avatarUrl'],
+                        //'union_id' => $result['unionId'] ?: '',
+                    ]);
+                } else {
+                    throw new \Exception('解密失败');
+                }
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
             }
-//            if (is_array($result)) {
-//
-//                //获取解密后的用户信息
-//
-//                //        {
-//                //            "openId": "OPENID",
-//                //  "nickName": "NICKNAME",
-//                //  "gender": GENDER,
-//                //  "city": "CITY",
-//                //  "province": "PROVINCE",
-//                //  "country": "COUNTRY",
-//                //  "avatarUrl": "AVATARURL",
-//                //  "unionId": "UNIONID",
-//                //  "watermark": {
-//                //            "appid":"APPID",
-//                //    "timestamp":TIMESTAMP
-//                //  }
-//                //}
-//
-//            }
+
         } else {
             $uid = $exists['user_id'];
             $user = UserInfo::query()->where('user_id', $uid)->first()->toArray();
