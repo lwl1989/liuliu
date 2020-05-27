@@ -94,7 +94,7 @@ class UserCoachController extends Controller
         }
     }
     /**
-     * @api               {get} /api/tab/{tab_id} 按频道取教练列表
+     * @api               {get} /api/tag/{tab_id} 按频道取教练列表
      * @apiGroup          内容获取
      * @apiName           按频道取教练列表
      * @apiVersion        1.0.0
@@ -124,7 +124,7 @@ class UserCoachController extends Controller
      *
      * @return array
      */
-    public function tab(Request $request): array
+    public function tag(Request $request): array
     {
         $tagId = $request->route('tag_id');
         $coaches = UserCoachTags::query()->where('tag_id', $tagId)->get()->toArray();

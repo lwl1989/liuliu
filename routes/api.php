@@ -60,6 +60,7 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
         Route::get('follows/{uid}', 'Users\UserController@follows');
         Route::get('contents/{uid}', 'Users\UserController@contents');
         Route::get('comments/{uid}', 'Users\UserController@comments');
+        Route::get('question/{uid}', 'Users\UsersController@questions');
         Route::post('center', 'Users\UserController@center');
         Route::post('follow', 'Users\UserController@follow');
         Route::post('unfollow', 'Users\UserController@unFollow');
@@ -70,7 +71,7 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
         Route::get('answer/{uid}/{typ}','Users\UserCoachController@answers');
         Route::get('info/{uid}','Users\UserCoachController@info');
         Route::get('recommend','Users\UserCoachController@recommend');
-        Route::get('tag/{tab_id}','Users\UserCoachController@tab');
+        Route::get('tag/{tab_id}','Users\UserCoachController@tag');
         Route::post('join','Users\UserCoachController@join');
     });
 });

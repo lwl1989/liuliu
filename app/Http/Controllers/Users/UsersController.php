@@ -9,6 +9,7 @@ use App\Library\Constant\Common;
 use App\Models\Content\Content;
 use App\Models\Content\ContentComment;
 use App\Models\Content\ContentCounts;
+use App\Models\Question\Questions;
 use App\Models\RegisterUsers\UserCoach;
 use App\Models\RegisterUsers\UserCounts;
 use App\Models\RegisterUsers\UserInfo;
@@ -186,6 +187,55 @@ class UsersController extends Controller
 
         return [
             'contents' => $contents
+        ];
+    }
+
+    /**
+     * @api               {get} /api/user/questions/{uid} 用户发布的问题
+     * @apiGroup          内容获取
+     * @apiName           用户发布的问题
+     * @apiVersion        1.0.0
+     *
+     * @apiSuccessExample Success-Response
+     * {
+     *    "questions":[
+     *          {
+     *                "id":"1",
+     *                    "title":"xxxxx",
+     *                    "content":"xxxxxxxxxxxx",
+     *                    "user":{
+     *                          "user_id":"1",
+     *                          "avatar":"",
+     *                          "nickname":"xxxx"
+     *                      },
+     *                    "counts":{
+     *                      "3":"100",
+     *                      "6":"13567746",
+     *                    }
+     *          }
+     *      ]
+     * }
+     */
+    /**
+     * @param Request $request
+     *
+     * @return array
+     */
+    public function questions(Request $request): array
+    {
+        $uid = $request->route('uid');
+        $questions = Questions::query()
+            ->where('user_id', $uid)
+            ->where('status', Common::STATUS_NORMAL)
+            ->orderBy('create_time', 'desc')
+            ->get()
+            ->toArray();
+
+        $contents = UserInfo::getUserInfoWithList($questions);
+        $contents = ContentCounts::getContentsCounts($questions);
+
+        return [
+            'questions' => $questions
         ];
     }
 
