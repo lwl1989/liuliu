@@ -94,7 +94,7 @@ class UserCoachController extends Controller
         }
     }
     /**
-     * @api               {get} /api/tag/{tab_id} 按频道取教练列表
+     * @api               {get} /api/coach/tag/{tag_id} 按频道取教练列表
      * @apiGroup          内容获取
      * @apiName           按频道取教练列表
      * @apiVersion        1.0.0
