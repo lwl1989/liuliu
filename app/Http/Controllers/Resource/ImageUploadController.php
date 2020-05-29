@@ -18,10 +18,11 @@ class ImageUploadController extends Controller
 
     /**
      *  '/static/user/avatar', '/static/content/cover', '/static/content/images', '/static/content/videos'
-     * @api               {get} /api/static/user/avatar 上传
+     * @api               {post} /api/static/user/avatar 上传
      * @apiGroup          用户操作
      * @apiName           上传文件
      *
+     * @apiDescription   同样的路由还有 '/static/user/avatar', '/static/content/cover', '/static/content/images', '/static/content/videos' 都是用于文件上传
      * @apiParam {File} file
      * @apiVersion        1.0.0
      *
