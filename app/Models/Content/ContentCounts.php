@@ -40,13 +40,11 @@ class ContentCounts extends Model
 
         $listIds = array_column($list, 'id');
         $ccs = ContentCounts::query()->whereIn('content_id', $listIds)->whereIn('typ', $types)->get()->toArray();
-        $item['counts'] = [];
-        foreach ($types as $type) {
-            $item['counts'][$type] = 0;
-        }
+
         foreach ($list as &$item) {
+            $item['counts'] = [];
            foreach ($types as $type) {
-               $item[$type] = 0;
+               $item['counts'][$type] = 0;
            }
 
            foreach ($ccs as $cc) {
