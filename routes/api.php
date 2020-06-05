@@ -57,13 +57,13 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
     });
 
     Route::group(['prefix' => 'user'],function (){
-        Route::get('follows/{uid}', 'Users\UserController@follows');
-        Route::get('contents/{uid}', 'Users\UserController@contents');
-        Route::get('comments/{uid}', 'Users\UserController@comments');
+        Route::get('follows/{uid}', 'Users\UsersController@follows');
+        Route::get('contents/{uid}', 'Users\UsersController@contents');
+        Route::get('comments/{uid}', 'Users\UsersController@comments');
         Route::get('question/{uid}', 'Users\UsersController@questions');
-        Route::post('center', 'Users\UserController@center');
-        Route::post('follow', 'Users\UserController@follow');
-        Route::post('unfollow', 'Users\UserController@unFollow');
+        Route::post('center', 'Users\UsersController@center');
+        Route::post('follow', 'Users\UsersController@follow');
+        Route::post('unfollow', 'Users\UsersController@unFollow');
     });
 
     Route::group(['prefix' => 'coach'], function (){
@@ -263,7 +263,7 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
 //
 ////開放API接口
 //Route::group(['middleware' => ['format'], 'prefix' => 'open'], function () {
-//    Route::post('user/account',     'OpenAPI\UserController@checkAccount');
+//    Route::post('user/account',     'OpenAPI\UsersController@checkAccount');
 //
 //    Route::post('msg/status',       'OpenAPI\MessageController@status');
 //    Route::post('msg/push',         'OpenAPI\MessageController@sendUser');
