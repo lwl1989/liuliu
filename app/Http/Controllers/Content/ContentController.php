@@ -34,6 +34,7 @@ class ContentController extends Controller
      * @apiParam {String} title
      * @apiParam {String} typ
      * @apiParam {String} content
+     * @apiParam {String} template_id
      * @apiParam {String} cover 封面图
      * @apiParam {List} tag_ids  标签（支持多选？接口支持）
      * @apiParam {List} topic_ids 话题（支持多选？接口支持）
@@ -47,7 +48,7 @@ class ContentController extends Controller
         DB::beginTransaction();
         $uid = Auth::id();
         try {
-            $params = ArrayParse::checkParamsArray(['title', 'typ', 'content', 'cover'], $request->input());
+            $params = ArrayParse::checkParamsArray(['title', 'typ', 'content', 'cover','template_id'], $request->input());
             $params['user_id'] = $uid;
             $cid = Content::query()->insertGetId($params);
 
