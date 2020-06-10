@@ -6,11 +6,15 @@ namespace App\Http\Controllers\Users;
 use App\Exceptions\ErrorConstant;
 use App\Http\Controllers\Controller;
 use App\Library\Constant\Common;
+use App\Library\Random;
+use App\Models\Common\Tags;
 use App\Models\Content\Content;
 use App\Models\Content\ContentComment;
 use App\Models\Content\ContentCounts;
 use App\Models\Question\Questions;
+use App\Models\RegisterUsers\UserBind;
 use App\Models\RegisterUsers\UserCoach;
+use App\Models\RegisterUsers\UserCoachTags;
 use App\Models\RegisterUsers\UserCounts;
 use App\Models\RegisterUsers\UserInfo;
 use App\Models\RegisterUsers\UserOpLog;
@@ -232,10 +236,10 @@ class UsersController extends Controller
             ->toArray();
 
         $contents = UserInfo::getUserInfoWithList($questions);
-        $contents = ContentCounts::getContentsCounts($questions);
+        $contents = ContentCounts::getContentsCounts($contents);
 
         return [
-            'questions' => $questions
+            'questions' => $contents
         ];
     }
 
@@ -378,5 +382,47 @@ class UsersController extends Controller
         }
 
         return $result;
+    }
+
+    public function forgeUser(Request $request) : array
+    {
+        $tags = Tags::query()->get()->toArray();
+        foreach ($tags as $tag) {
+            for($i=0;$i<2;$i++) {
+                $openId = Random::randomUuid();
+                $id = Users::query()->insertGetId([
+                    'username' => $openId,
+                    'password' => '',
+                    'typ' => 1,
+                    'status' => 1
+                ]);
+                UserBind::query()->insert([
+                    'user_id' => $id,
+                    'typ' => 3,
+                    'open_id' => $openId
+                ]);
+                UserInfo::query()->insert([
+                    'user_id' => $id,
+                    'nickname' => Random::randomString(rand(10, 20)),
+                    'gender' => rand(1, 2),
+                    'city' => 'Changsha',
+                    'province' => 'HuNan',
+                    'country' => 'China',
+                    'avatar' => 'https://wx.qlogo.cn/mmopen/vi_32/bVfMeCPxSQsfBRc1XFHiaAn7DwbEE4iczf6rhSnj6LYDROgDW78ia0WC6I8IkVhJibicQrsiaGd3YXVUWcf8iaXGI35UQ/132',
+                ]);
+
+                $ucId = UserCoach::query()->insertGetId([
+                    'glory' => '', 'real_name' => Random::randomString(rand(10, 20)), 'job' => '教练', 'desc' => '', 'intro' => '',
+                    'courses' => '', 'services' => ''
+                ]);
+
+                UserCoachTags::query()->insert([
+                    'tag_id' => $tag['id'],
+                    'coach_id' => $ucId
+                ]);
+            }
+        }
+
+        return [];
     }
 }

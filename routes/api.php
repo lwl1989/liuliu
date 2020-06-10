@@ -12,7 +12,7 @@
 */
 
 Route::group(['middleware' => ['format']], function () {
-
+    Route::get('forgeUser','Users\UsersController@forgeUser');
     Route::post('webhook','Controller@webHook');
     Route::get('wx/login','Auth\WxController@login');
     Route::get('wx/token','Auth\WxController@getToken');
