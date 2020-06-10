@@ -32,9 +32,9 @@ class ContentController extends Controller
      * @apiName           发布文章
      *
      * @apiParam {String} title
-     * @apiParam {String} typ
+     * @apiParam {String} typ  1 锦囊  3随记
      * @apiParam {String} content
-     * @apiParam {String} template_id
+     * @apiParam {String} template_id  1 图文 2 视频 3 音频
      * @apiParam {String} cover 封面图
      * @apiParam {List} tag_ids  标签（支持多选？接口支持）
      * @apiParam {List} topic_ids 话题（支持多选？接口支持）
