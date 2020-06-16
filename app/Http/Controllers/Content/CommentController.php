@@ -15,7 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class Comment extends Controller
+class CommentController extends Controller
 {
     /**
      * @api               {post} /api/content/comment 评论文章

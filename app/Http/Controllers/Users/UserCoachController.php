@@ -165,7 +165,7 @@ class UserCoachController extends Controller
     }
 
     /**
-     * @api               {get} /api/coach/recommend 首页推荐教练
+     * @api               {get} /api/recommend/coach 首页推荐教练
      * @apiGroup          内容获取
      * @apiName           获取教练基本信息
      * @apiVersion        1.0.0
@@ -185,16 +185,39 @@ class UserCoachController extends Controller
      */
     public function recommend(): array
     {
-        $coach = UserCoach::query()->where('status', Common::STATUS_NORMAL)->get(['user_id'])->toArray();
 
-        if (empty($coach)) {
+        $coaches = UserCoach::query()->where('status', Common::STATUS_NORMAL)->get(['user_id'])->toArray();
+
+        if (empty($coaches)) {
             return ['code' => ErrorConstant::DATA_ERR, 'response' => '暂时未有教练'];
         }
 
-        $userIds = array_column($coach, 'user_id');
+        $userIds = array_column($coaches, 'user_id');
         $infos = UserInfo::query()->whereIn('user_id', $userIds)->get(['user_id', 'avatar', 'nickname'])->toArray();
+        $infos = array_column($infos, null, 'user_id');
+        //$coaches = UserInfo::getUserInfoWithList($coaches);
+
+        try {
+            $id = Auth::id();
+        } catch (\Exception $exception) {
+            $id = 0;
+        }
+        if ($id > 0) {
+            $relations = UserRelations::followRelation($id, array_keys($infos));
+            foreach ($coaches as &$coach) {
+                $coach['user'] = $infos[$coach['user_id']];
+                $coach['followed'] = $relations[$coach['user_id']];
+                unset($coach);
+            }
+        } else {
+            foreach ($coaches as &$coach) {
+                $coach['user'] = $infos[$coach['user_id']];
+                $coach['followed'] = 0;
+            }
+        }
+
         return [
-            'coaches' => $infos
+            'coaches' => $coaches
         ];
     }
 

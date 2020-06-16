@@ -27,6 +27,11 @@ Route::group(['middleware' => ['format']], function () {
         Route::get('recommend','Content\TopicController@recommend');
         Route::get('info/{id}','Content\TopicController@info');
     });
+
+    Route::group(['prefix'=>'recommend'], function (){
+        Route::get('/content','Content\ContentController@recommend');
+        Route::get('/coach','Users\UserCoachController@recommend');
+    });
 });
 
 Route::group(['middleware' => ['format','auth:c_api']], function () {

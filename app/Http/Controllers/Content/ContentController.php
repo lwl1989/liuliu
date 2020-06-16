@@ -18,6 +18,7 @@ use App\Models\Content\ContentComment;
 use App\Models\Content\ContentCounts;
 use App\Models\Content\ContentTags;
 use App\Models\RegisterUsers\UserCounts;
+use App\Models\RegisterUsers\UserInfo;
 use App\Models\RegisterUsers\UserOpLog;
 use App\Services\ContentService;
 use Illuminate\Http\Request;
@@ -48,7 +49,7 @@ class ContentController extends Controller
         DB::beginTransaction();
         $uid = Auth::id();
         try {
-            $params = ArrayParse::checkParamsArray(['title', 'typ', 'content', 'cover','template_id'], $request->input());
+            $params = ArrayParse::checkParamsArray(['title', 'typ', 'content', 'cover', 'template_id'], $request->input());
             $params['user_id'] = $uid;
             $cid = Content::query()->insertGetId($params);
 
@@ -96,8 +97,8 @@ class ContentController extends Controller
      * @api               {get} /api/content/ 频道内容列表
      *
      * @apiParam {String} tag_id
-     *  @apiParam {String} page
-     *   @apiParam {String} limit
+     * @apiParam {String} page
+     * @apiParam {String} limit
      * @apiGroup          内容获取
      * @apiName           获取不同标签下文章内容
      *
@@ -154,5 +155,49 @@ class ContentController extends Controller
     }
 
 
+    /**
+     * @api               {get} /api/recommend/content 频道内容列表
+     *
+     * @apiParam {String} typ 1 锦囊 2素材 3随记
+     * @apiGroup          内容获取
+     * @apiName           获取首页推荐数据
+     *
+     * @apiVersion        1.0.0
+     *
+     * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     *   {
+     *      "contents": [
+     *          {
+     *              'content':{
+     *              "id": "1",
+     *              "name": "真人秀",
+     *              "sort": "1",
+     *              "status": "1",
+     *              "create_time": "1588069984",
+     *              "update_time": "1588069984"
+     *              },
+     *              'user':{//userinfo}
+     *          }
+     *          ,//...
+     *      ],
+     *   }
+     */
+    /**
+     * @param Request $request
+     * @return array
+     */
+    public function recommend(Request $request): array
+    {
+        $type = $request->get('type', 1);
+
+        $result = Content::query()->where('typ', $type)->inRandomOrder()->take(10)->get()->toArray();
+        $result = UserInfo::getUserInfoWithList($result);
+        $result = ContentCounts::getContentsCounts($result);
+
+        return [
+            'contents' => $result
+        ];
+    }
 
 }
