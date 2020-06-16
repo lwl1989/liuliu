@@ -138,7 +138,7 @@ class UserCoachController extends Controller
             return ['coaches' => []];
         }
 
-        $userIds = array_column($coachIds, 'user_id');
+        $userIds = array_column($coaches, 'user_id');
         $coachTags = UserCoachTags::query()->whereIn('coach_id', $coachIds)->get()->toArray();
         $tagsIds = array_column($coachTags, 'tag_id');
         $tags = Tags::query()->whereIn('id', $tagsIds)->get()->toArray();
