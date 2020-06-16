@@ -160,7 +160,7 @@ class UserCoachController extends Controller
             unset($coach);
         }
         return [
-            'coaches' => $userInfo
+            'coaches' => $coaches
         ];
     }
 
