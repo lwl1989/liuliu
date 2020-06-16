@@ -149,6 +149,7 @@ class Handler extends ExceptionHandler
         $code = intval($e->getCode());
         $code = $code > 0 ? $code : 1;
         $status = 200;
+        var_dump($e->getTraceAsString());
 //        echo '<pre>';
 //        var_dump($e->getTraceAsString());
         //只有認證錯誤返回401
