@@ -173,10 +173,10 @@ class UserCoachController extends Controller
      * @apiSuccessExample Success-Response
      * [
      *     {
+     *                  "id":1,
+     *                  "user_id":"22",
      *                  "join_time":"2020-04-20 12:12:12",
-     *                  "tags"  :   [
-     *                          {"id":"1","name":"教练标签"},//...
-     *                  ],
+     *
      *                    "intro":"dsadasdsa",
      *                    "desc":"dasfghfdsfgdfgfhdg",
      *                    "user":{
@@ -196,7 +196,7 @@ class UserCoachController extends Controller
     public function recommend(): array
     {
 
-        $coaches = UserCoach::query()->where('status', Common::STATUS_NORMAL)->inRandomOrder()->limit(10)->get(['user_id'])->toArray();
+        $coaches = UserCoach::query()->where('status', Common::STATUS_NORMAL)->inRandomOrder()->limit(10)->get()->toArray();
 
         if (empty($coaches)) {
             return ['code' => ErrorConstant::DATA_ERR, 'response' => '暂时未有教练'];
