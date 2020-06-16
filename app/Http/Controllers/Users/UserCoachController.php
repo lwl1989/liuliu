@@ -146,6 +146,9 @@ class UserCoachController extends Controller
         $userInfo = UserInfo::query()->whereIn('user_id', $userIds)->get()->toArray();
         $userInfo = array_column($userInfo, null, 'user_id');
         $relations = UserRelations::followRelation(Auth::id(), $userIds);
+        echo '<pre>';
+        var_dump($coaches);
+        var_dump($coachTags);
         foreach ($coaches as &$coach) {
             $coach['tags'] = [];
             foreach ($coachTags as $coachTag) {
