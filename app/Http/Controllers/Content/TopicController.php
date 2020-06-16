@@ -22,7 +22,7 @@ class TopicController
 {
 
     /**
-     * @api               {get} /api/topic/recommend 首页推荐话题
+     * @api               {get} /api/recommend/topic 首页推荐话题
      * @apiGroup          首页数据
      * @apiName           推荐话题
      * @apiVersion        1.0.0
@@ -39,8 +39,7 @@ class TopicController
      */
     public function recommend(): array
     {
-        $topics = Topics::query()->where('status', Common::STATUS_NORMAL)
-            ->orderBy('follow', 'desc')->get()->toArray();
+        $topics = Topics::query()->where('status', Common::STATUS_NORMAL)->inRandomOrder()->limit(10)->get()->toArray();
         return [
             'topics' => $topics
         ];
