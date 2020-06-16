@@ -71,7 +71,7 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
         Route::get('answer/{uid}/{typ}','Users\UserCoachController@answers');
         Route::get('info/{uid}','Users\UserCoachController@info');
         Route::get('recommend','Users\UserCoachController@recommend');
-        Route::get('tag/{tab_id}','Users\UserCoachController@tag');
+        Route::get('tag/{tag_id}','Users\UserCoachController@tag');
         Route::post('join','Users\UserCoachController@join');
     });
 });
