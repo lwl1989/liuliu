@@ -31,6 +31,7 @@ Route::group(['middleware' => ['format']], function () {
     Route::group(['prefix'=>'recommend'], function (){
         Route::get('/content','Content\ContentController@recommend');
         Route::get('/coach','Users\UserCoachController@recommend');
+        Route::get('/topic','Content\TopicController@recommend');
     });
 });
 
