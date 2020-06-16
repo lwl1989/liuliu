@@ -150,7 +150,9 @@ class UserCoachController extends Controller
             $coach['tags'] = [];
             foreach ($coachTags as $coachTag) {
                 if ($coachTag['coach_id'] == $coach['id']) {
-                    $coach['tags'][] = $tags[$coachTag['tag_id']];
+                    if (isset($tags[$coachTag['tag_id']])) {
+                        $coach['tags'][] = $tags[$coachTag['tag_id']];
+                    }
                 }
             }
             $coach['user'] = $userInfo[$coach['user_id']];
