@@ -159,8 +159,8 @@ class ContentController extends Controller
      * @api               {get} /api/recommend/content 频道内容列表
      *
      * @apiParam {String} typ 1 锦囊 2素材 3随记
-     * @apiGroup          内容获取
-     * @apiName           获取首页推荐数据
+     * @apiGroup          首页数据
+     * @apiName           获取首页推荐内容
      *
      * @apiVersion        1.0.0
      *

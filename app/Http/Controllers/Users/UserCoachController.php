@@ -166,17 +166,27 @@ class UserCoachController extends Controller
 
     /**
      * @api               {get} /api/recommend/coach 首页推荐教练
-     * @apiGroup          内容获取
-     * @apiName           获取教练基本信息
+     * @apiGroup          首页数据
+     * @apiName           首页推荐教练
      * @apiVersion        1.0.0
      *
      * @apiSuccessExample Success-Response
      * [
      *     {
-     *                  "user_id": "1",
-     *                  "nickname": "休息休息",
-     *                  "avatar": "https://xxxxxx/",
-     *    },//...
+     *                  "join_time":"2020-04-20 12:12:12",
+     *                  "tags"  :   [
+     *                          {"id":"1","name":"教练标签"},//...
+     *                  ],
+     *                    "intro":"dsadasdsa",
+     *                    "desc":"dasfghfdsfgdfgfhdg",
+     *                    "user":{
+     *                          "user_id":"111",
+     *                          "nickname":"dsadsad",
+     *                          "avatar":"erfgh"
+     *                      },
+     *                    "followed":"0" //0未关注  1已关注
+     *
+     *     }, //......
      * ]
      *
      */
@@ -186,7 +196,7 @@ class UserCoachController extends Controller
     public function recommend(): array
     {
 
-        $coaches = UserCoach::query()->where('status', Common::STATUS_NORMAL)->get(['user_id'])->toArray();
+        $coaches = UserCoach::query()->where('status', Common::STATUS_NORMAL)->inRandomOrder()->limit(10)->get(['user_id'])->toArray();
 
         if (empty($coaches)) {
             return ['code' => ErrorConstant::DATA_ERR, 'response' => '暂时未有教练'];

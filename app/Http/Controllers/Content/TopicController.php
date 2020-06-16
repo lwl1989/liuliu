@@ -23,7 +23,7 @@ class TopicController
 
     /**
      * @api               {get} /api/topic/recommend 首页推荐话题
-     * @apiGroup          内容获取
+     * @apiGroup          首页数据
      * @apiName           推荐话题
      * @apiVersion        1.0.0
      *
