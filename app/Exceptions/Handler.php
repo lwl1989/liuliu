@@ -150,7 +150,7 @@ class Handler extends ExceptionHandler
         $code = $code > 0 ? $code : 1;
         $status = 200;
 //        echo '<pre>';
-       var_dump($e->getTraceAsString());
+//        var_dump($e->getTraceAsString());
         //只有認證錯誤返回401
         if ($e instanceof AuthenticationException) {
             $code = ErrorConstant::UN_AUTH_ERROR;

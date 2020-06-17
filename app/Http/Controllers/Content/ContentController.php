@@ -88,20 +88,27 @@ class ContentController extends Controller
         $tags = [];
         $topics = [];
         if ($relations) {
-
+            $tagsIds = [];
+            $topicsIds = [];
             foreach ($relations->toArray() as $item) {
                 if ($item['type'] == 1) {
-                    $tags[] = $item['relation_id'];
+                    $tagsIds[] = $item['relation_id'];
                 } else {
-                    $topics[] = $item['relation_id'];
+                    $topicsIds[] = $item['relation_id'];
                 }
             }
 
-            if (!empty($tags)) {
-                $tags = Tags::query()->whereIn('id', $tags)->get()->toArray();
+            if (!empty($tagsIds)) {
+                $t = Tags::query()->whereIn('id', $tagsIds)->get();
+                if ($t) {
+                    $tags = $t->toArray();
+                }
             }
-            if (!empty($topics)) {
-                $topics = Tags::query()->whereIn('id', $topics)->get()->toArray();
+            if (!empty($topicsIds)) {
+                $t1 = Tags::query()->whereIn('id', $topicsIds)->get();
+                if ($t1) {
+                    $topics = $t1->toArray();
+                }
             }
         }
         $user = Users::query()->find($content['user_id'])->toArray();
