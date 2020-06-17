@@ -32,7 +32,7 @@ use Illuminate\Support\Facades\DB;
 class ContentController extends Controller
 {
     /**
-     * @api               {get} /api/content/detail 频道内容列表
+     * @api               {get} /api/content/detail 获取内容详情
      *
      * @apiParam {String} id 内容id
      * @apiGroup          内容获取
