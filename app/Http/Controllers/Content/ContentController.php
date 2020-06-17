@@ -13,13 +13,16 @@ use App\Exceptions\ErrorConstant;
 use App\Http\Controllers\Controller;
 use App\Library\ArrayParse;
 use App\Library\Constant\Common;
+use App\Models\Common\Tags;
 use App\Models\Content\Content;
-use App\Models\Content\ContentComment;
 use App\Models\Content\ContentCounts;
 use App\Models\Content\ContentTags;
+use App\Models\Content\Resources;
+use App\Models\RegisterUsers\UserCoach;
 use App\Models\RegisterUsers\UserCounts;
 use App\Models\RegisterUsers\UserInfo;
 use App\Models\RegisterUsers\UserOpLog;
+use App\Models\RegisterUsers\Users;
 use App\Services\ContentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -27,6 +30,91 @@ use Illuminate\Support\Facades\DB;
 
 class ContentController extends Controller
 {
+    /**
+     * @api               {get} /api/content/detail 频道内容列表
+     *
+     * @apiParam {String} id 内容id
+     * @apiGroup          内容获取
+     * @apiName           获取内容详情
+     *
+     * @apiVersion        1.0.0
+     *
+     * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     *   {
+     *      'content':{
+     *              "id": "1",
+     *              "name": "真人秀",
+     *              "sort": "1",
+     *              "status": "1",
+     *              "create_time": "1588069984",
+     *              "update_time": "1588069984"
+     *       },
+     *       'user':{
+     *          //用户属性
+     *          'is_coach':1,
+     *          'job':'xxx',
+     *          'real_name':'xxx'
+     *         },
+     *      "tags":[{"id":"1","name":"ojbk"}],
+     *      "topics":[{"id":"1","name":"ojbk"}],
+     *      "resources":[{"id":"1","value":"httpxxxxxxx"}]
+     *   }
+     */
+    public function detail(Request $request): array
+    {
+        $id = $request->get('id');
+        if (!$id) {
+            return ['code' => ErrorConstant::PARAMS_ERROR, 'response' => '参数错误'];
+        }
+
+        $content = Content::query()->where('id', $id)->first();
+        $resource = Resources::query()->where('content_id', $id)->where('status', Common::STATUS_NORMAL)->get();
+        $resources = [];
+        if ($resource) {
+            $resources = $resource->toArray();
+        }
+
+        $relations = ContentTags::query()->where('content_id', $id)->get();
+        $tags = [];
+        $topics = [];
+        if ($relations) {
+
+            foreach ($relations->toArray() as $item) {
+                if ($item['type'] == 1) {
+                    $tags[] = $item['relation_id'];
+                } else {
+                    $topics[] = $item['relation_id'];
+                }
+            }
+
+            if (!empty($tags)) {
+                $tags = Tags::query()->whereIn('id', $tags)->get()->toArray();
+            }
+            if (!empty($topics)) {
+                $topics = Tags::query()->whereIn('id', $topics)->get()->toArray();
+            }
+        }
+        $user = Users::query()->find($content['user_id'])->toArray();
+        $user['is_coach'] = 0;
+        $user['job'] = '';
+        $user['real_name'] = '';
+        $userCoach = UserCoach::query()->where('user_id', $content['user_id'])->where('status', Common::STATUS_NORMAL)->first();
+        if ($userCoach) {
+            $userCoach = $userCoach->toArray();
+            $user['is_coach'] = 1;
+            $user['job'] = $userCoach['job'];
+            $user['real_name'] = $userCoach['real_name'];
+        }
+        return [
+            'content' => $content,
+            'resources' => $resources,
+            'tags' => $tags,
+            'topics' => $topics,
+            'user' => $user
+        ];
+    }
+
     /**
      * @api               {post} /api/content/release 发布文章
      * @apiGroup          内容操作
@@ -37,6 +125,7 @@ class ContentController extends Controller
      * @apiParam {String} content
      * @apiParam {String} template_id  1 图文 2 视频 3 音频
      * @apiParam {String} cover 封面图
+     * @apiParam {List} 静态资源集合（资源类型和template绑定）
      * @apiParam {List} tag_ids  标签（支持多选？接口支持）
      * @apiParam {List} topic_ids 话题（支持多选？接口支持）
      * @apiVersion        1.0.0
@@ -46,8 +135,8 @@ class ContentController extends Controller
      */
     public function release(Request $request): array
     {
-        DB::beginTransaction();
         $uid = Auth::id();
+        DB::beginTransaction();
         try {
             $params = ArrayParse::checkParamsArray(['title', 'typ', 'content', 'cover', 'template_id'], $request->input());
             $params['user_id'] = $uid;
@@ -85,6 +174,26 @@ class ContentController extends Controller
                 'op_typ_id' => $cid,
                 'typ' => $typ
             ]);
+
+            $resources = $request->input('resources', []);
+            if (!empty($resources) && !is_array($resources)) {
+                if ($params['template_id'] == 1) {
+                    if (count($resources) > 3) {
+                        return ['code' => ErrorConstant::PARAMS_ERROR, 'response' => '参数错误(图片长度)'];
+                    }
+                } else {
+                    if (count($resources) > 1) {
+                        return ['code' => ErrorConstant::PARAMS_ERROR, 'response' => '参数错误(资源长度)'];
+                    }
+                }
+                foreach ($resources as $resource) {
+                    Resources::query()->create([
+                        'content_id' => $cid,
+                        'status' => Common::STATUS_NORMAL,
+                        'value' => $resource
+                    ]);
+                }
+            }
             DB::commit();
             return ['id' => $cid];
         } catch (\Exception $e) {
