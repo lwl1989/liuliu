@@ -141,7 +141,7 @@ class ContentController extends Controller
      * @apiParam {String} content
      * @apiParam {String} template_id  1 图文 2 视频 3 音频
      * @apiParam {String} cover 封面图
-     * @apiParam {List} 静态资源集合（资源类型和template绑定）
+     * @apiParam {List} resources 静态资源集合（资源类型和template绑定）
      * @apiParam {List} tag_ids  标签（支持多选？接口支持）
      * @apiParam {List} topic_ids 话题（支持多选？接口支持）
      * @apiVersion        1.0.0
