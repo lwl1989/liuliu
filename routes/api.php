@@ -30,6 +30,7 @@ Route::group(['middleware' => ['format']], function () {
 
     Route::group(['prefix' => 'content'],function (){
         Route::get('/detail','Content\ContentController@detail');
+        Route::get('/comments','Content\CommentController@detail');
     });
     Route::group(['prefix'=>'recommend'], function (){
         Route::get('/content','Content\ContentController@recommend');

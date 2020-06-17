@@ -7,10 +7,14 @@ namespace App\Http\Controllers\Content;
 use App\Exceptions\ErrorConstant;
 use App\Http\Controllers\Controller;
 use App\Library\Constant\Common;
+use App\Models\Content\Content;
 use App\Models\Content\ContentComment;
 use App\Models\Content\ContentCounts;
 use App\Models\RegisterUsers\UserCounts;
+use App\Models\RegisterUsers\UserInfo;
 use App\Models\RegisterUsers\UserOpLog;
+use App\Models\RegisterUsers\Users;
+use App\Models\RegisterUsers\UserZan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -42,8 +46,9 @@ class CommentController extends Controller
             return ['code' => ErrorConstant::PARAMS_ERROR, 'response' => 'id错误'];
         }
         $content = $request->post('content', '');
-        DB::beginTransaction();
         $uid = Auth::id();
+
+        DB::beginTransaction();
         try {
             DB::commit();
             ContentComment::query()->insertGetId([
@@ -66,6 +71,80 @@ class CommentController extends Controller
             DB::rollBack();
             return ['code' => ErrorConstant::SYSTEM_ERR, 'response' => $e->getMessage()];
         }
+    }
+
+    /**
+     * @api               {get} /api/content/comments 获取评论列表
+     *
+     * @apiParam {String} id 内容id
+     * @apiGroup          内容获取
+     * @apiName           获取评论列表
+     *
+     * @apiVersion        1.0.0
+     *
+     * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     *   {
+     *      'comments':{
+     *              "id": "1",
+     *              "content": "真人秀",
+     *              "user":{//用户信息},
+     *              "zan":"1",
+     *              "zanCount":"1"
+     *       },
+
+     *   }
+     */
+    /**
+     * @param Request $request
+     * @return array
+     */
+    public function all(Request $request): array
+    {
+        $id = $request->get('id');
+        if ($id < 1) {
+            return ['code' => ErrorConstant::PARAMS_ERROR, 'response' => 'id错误'];
+        }
+
+        $comments = ContentComment::query()->where('parent_id', 0)->where('status', Common::STATUS_NORMAL)->get()->toArray();
+
+        if (!empty($comments)) {
+            $comments = UserInfo::getUserInfoWithList($comments);
+            $commentIds = array_column($comments, 'id');
+            $zanCount = UserZan::query()->where('typ', 2)->where('obj_id', $commentIds)->groupBy('obj_id')->get(['count(*) as count', 'obj_id'])->toArray();
+            foreach ($comments as &$comment) {
+                $comment['zanCount'] = 0;
+                foreach ($zanCount as $item) {
+                    if ($item['obj_id'] == $comment['id']) {
+                        $comment['zanCount'] = $item['count'];
+                    }
+                }
+                unset($comment);
+            }
+
+            try {
+                $uid = Auth::id();
+            } catch (\Exception $e) {
+                $uid = 0;
+            }
+            if ($uid > 0) {
+                $exists = UserZan::query()->where('typ', 2)->where('obj_id', $commentIds)->where('user_id', $uid)->get(['id', 'user_id', 'obj_id'])->toArray();
+                foreach ($comments as &$comment) {
+                    $comment['zan'] = 0;
+
+                    foreach ($exists as $exist) {
+                        if ($exist['obj_id'] == $comment['id']) {
+                            $comment['zan'] = 1;
+                            break;
+                        }
+                    }
+                    unset($comment);
+                }
+            }
+        }
+        return [
+            'comments' => $comments
+        ];
     }
 
 }
