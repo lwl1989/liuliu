@@ -81,7 +81,6 @@ class ContentController extends Controller
         if(!$content) {
             return ['code' => ErrorConstant::PARAMS_ERROR, 'response' => '参数错误'];
         }
-        var_dump($content);exit();
 
         $content = $content->toArray();
         $resource = Resources::query()->where('content_id', $id)->where('status', Common::STATUS_NORMAL)->get();
