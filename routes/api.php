@@ -28,6 +28,9 @@ Route::group(['middleware' => ['format']], function () {
         Route::get('info/{id}','Content\TopicController@info');
     });
 
+    Route::group(['prefix' => 'content'],function (){
+        Route::get('/detail','Content\ContentController@detail');
+    });
     Route::group(['prefix'=>'recommend'], function (){
         Route::get('/content','Content\ContentController@recommend');
         Route::get('/coach','Users\UserCoachController@recommend');
@@ -49,9 +52,9 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
 
 
     Route::group(['prefix' => 'content'],function (){
-        Route::post('comment', 'Content\ContentController@comment');
+        //Route::post('comment', 'Content\ContentController@comment');
         Route::post('release', 'Content\ContentController@release');
-        Route::get('/detail','Content\ContentController@detail');
+
 
         Route::get('/', 'Content\ContentController@myList');
 

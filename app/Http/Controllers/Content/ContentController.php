@@ -15,6 +15,7 @@ use App\Library\ArrayParse;
 use App\Library\Constant\Common;
 use App\Models\Common\Tags;
 use App\Models\Content\Content;
+use App\Models\Content\ContentComment;
 use App\Models\Content\ContentCounts;
 use App\Models\Content\ContentTags;
 use App\Models\Content\Resources;
@@ -61,8 +62,13 @@ class ContentController extends Controller
      *      "topics":[{"id":"1","name":"ojbk"}],
      *      "resources":[{"id":"1","value":"httpxxxxxxx"}]
      *      "zan":"1",
-     *
+     *      "zanCount":"100",
+     *      "commentCount":"101"
      *   }
+     */
+    /**
+     * @param Request $request
+     * @return array
      */
     public function detail(Request $request): array
     {
@@ -110,16 +116,19 @@ class ContentController extends Controller
             $user['real_name'] = $userCoach['real_name'];
         }
         try {
-            $uid=Auth::id();
-        }catch (\Exception $exception){
-            $uid=0;
+            $uid = Auth::id();
+        } catch (\Exception $exception) {
+            $uid = 0;
         }
         $zan = 0;
-        if($uid>0){
+        $zanCount = 0;
+        $commentCount = ContentComment::query()->where('content_id', $id)->where('status', Common::STATUS_NORMAL)->count();
+        if ($uid > 0) {
             $exists = UserZan::query()->where('user_id', $uid)->where('typ', 1)->where('obj_id', $id)->first(['id']);
-            if($exists){
+            if ($exists) {
                 $zan = 1;
             }
+            $zanCount = UserZan::query()->where('typ', 1)->where('obj_id', $id)->count();
         }
         return [
             'content' => $content,
@@ -127,7 +136,9 @@ class ContentController extends Controller
             'tags' => $tags,
             'topics' => $topics,
             'user' => $user,
-            'zan'   =>  $zan,
+            'zan' => $zan,
+            'zanCount' => $zanCount,
+            'commentCount' => $commentCount
         ];
     }
 
