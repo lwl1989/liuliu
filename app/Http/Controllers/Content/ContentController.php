@@ -23,6 +23,7 @@ use App\Models\RegisterUsers\UserCounts;
 use App\Models\RegisterUsers\UserInfo;
 use App\Models\RegisterUsers\UserOpLog;
 use App\Models\RegisterUsers\Users;
+use App\Models\RegisterUsers\UserZan;
 use App\Services\ContentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -59,6 +60,8 @@ class ContentController extends Controller
      *      "tags":[{"id":"1","name":"ojbk"}],
      *      "topics":[{"id":"1","name":"ojbk"}],
      *      "resources":[{"id":"1","value":"httpxxxxxxx"}]
+     *      "zan":"1",
+     *
      *   }
      */
     public function detail(Request $request): array
@@ -106,12 +109,25 @@ class ContentController extends Controller
             $user['job'] = $userCoach['job'];
             $user['real_name'] = $userCoach['real_name'];
         }
+        try {
+            $uid=Auth::id();
+        }catch (\Exception $exception){
+            $uid=0;
+        }
+        $zan = 0;
+        if($uid>0){
+            $exists = UserZan::query()->where('user_id', $uid)->where('typ', 1)->where('obj_id', $id)->first(['id']);
+            if($exists){
+                $zan = 1;
+            }
+        }
         return [
             'content' => $content,
             'resources' => $resources,
             'tags' => $tags,
             'topics' => $topics,
-            'user' => $user
+            'user' => $user,
+            'zan'   =>  $zan,
         ];
     }
 
