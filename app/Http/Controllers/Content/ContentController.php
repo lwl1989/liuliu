@@ -96,7 +96,7 @@ class ContentController extends Controller
             $tagsIds = [];
             $topicsIds = [];
             foreach ($relations->toArray() as $item) {
-                if ($item['type'] == 1) {
+                if ($item['typ'] == 1) {
                     $tagsIds[] = $item['relation_id'];
                 } else {
                     $topicsIds[] = $item['relation_id'];
