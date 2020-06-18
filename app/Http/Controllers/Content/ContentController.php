@@ -226,9 +226,8 @@ class ContentController extends Controller
                     }
                 }
                 foreach ($resources as $resource) {
-                    var_dump($resource);
 
-                    Resources::query()->create([
+                    Resources::query()->insert([
                         'content_id' => $cid,
                         'status' => Common::STATUS_NORMAL,
                         'value' => $resource
