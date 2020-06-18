@@ -215,7 +215,7 @@ class ContentController extends Controller
             ]);
 
             $resources = $request->input('resources', []);
-            if (!empty($resources) && !is_array($resources)) {
+            if (!empty($resources) && is_array($resources)) {
                 if ($params['template_id'] == 1) {
                     if (count($resources) > 3) {
                         return ['code' => ErrorConstant::PARAMS_ERROR, 'response' => '参数错误(图片长度)'];
