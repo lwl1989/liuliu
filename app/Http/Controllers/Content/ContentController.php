@@ -225,6 +225,7 @@ class ContentController extends Controller
                         return ['code' => ErrorConstant::PARAMS_ERROR, 'response' => '参数错误(资源长度)'];
                     }
                 }
+                var_dump($resources);
                 foreach ($resources as $resource) {
                     Resources::query()->create([
                         'content_id' => $cid,
