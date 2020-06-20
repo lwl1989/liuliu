@@ -153,7 +153,7 @@ class QuestionController extends Controller
      * @apiName           发布问题
      *
      * @apiParam {String} title
-     * @apiParam {String} typ
+     * @apiParam {String} typ 固定为2 针对指定教练提问
      * @apiParam {String} content
      * @apiParam {String} cover 封面图
      * @apiParam {List} tag_ids  标签（支持多选？接口支持）
