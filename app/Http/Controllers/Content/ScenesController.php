@@ -28,7 +28,7 @@ class ScenesController extends Controller
     /**
      * @api               {get} /api/scene/index 场景首页
      *
-     * @apiGroup          场景首页
+     * @apiGroup          场景
      * @apiName           获取场景列表
      *
      * @apiVersion        1.0.0
