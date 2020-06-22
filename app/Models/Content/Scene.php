@@ -11,10 +11,10 @@ namespace App\Models\Content;
 
 use App\Models\Model;
 
-class Area extends Model
+class Scene extends Model
 {
 
-    public $table = 'area';
+    public $table = 'scene';
 
     public $timestamps = true;
     const CREATED_AT = 'create_time';

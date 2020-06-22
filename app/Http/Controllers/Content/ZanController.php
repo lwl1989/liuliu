@@ -28,7 +28,7 @@ class ZanController extends Controller
      * @apiName           点赞
      *
      * @apiParam {String} cid  文章id
-     * @apiParam {String} typ  类型  1文章  2评论 3 问题 4回答
+     * @apiParam {String} typ  类型  1文章  2评论 3 问题 4 回答 5 场景意见
      * @apiVersion        1.0.0
      *
      * @apiSuccessExample Success-Response:
