@@ -26,7 +26,7 @@ use Illuminate\Support\Facades\DB;
 class ScenesController extends Controller
 {
     /**
-     * @api               {get} /api/scene/index 场景
+     * @api               {get} /api/scene/index 场景首页
      *
      * @apiGroup          场景首页
      * @apiName           获取场景列表
@@ -66,7 +66,7 @@ class ScenesController extends Controller
         ];
     }
     /**
-     * @api               {get} /api/scenes 场景
+     * @api               {get} /api/scenes 获取场景列表
      *
      * @apiParam {String} page
      * @apiParam {String} limit
@@ -122,7 +122,7 @@ class ScenesController extends Controller
 
 
     /**
-     * @api               {get} /api/scene/detail/{scene_id} 场景
+     * @api               {get} /api/scene/detail/{scene_id} 获取场景详情
      *
      * @apiGroup          场景
      * @apiName           获取场景详情
@@ -167,7 +167,7 @@ class ScenesController extends Controller
 
 
     /**
-     * @api               {get} /api/scene/reply/replies/{scene_id} 场景
+     * @api               {get} /api/scene/reply/replies/{scene_id} 获取场景意见列表
      *
      * @apiParam {String} page
      * @apiParam {String} limit
@@ -251,7 +251,7 @@ class ScenesController extends Controller
     }
 
     /**
-     * @api               {get} /api/scene/reply/release 场景
+     * @api               {get} /api/scene/reply/release 发布场景
      *
      * @apiGroup          场景
      * @apiName           发布场景
@@ -294,10 +294,10 @@ class ScenesController extends Controller
     }
 
     /**
-     * @api               {get} /api/scene/reply/{scene_id} 场景
+     * @api               {get} /api/scene/reply/{scene_id} 发布场景意见
      *
      * @apiGroup          场景
-     * @apiName           发布场景
+     * @apiName           发布场景意见
      *
      * @apiParam {String} value         意见内容
      * @apiVersion        1.0.0
