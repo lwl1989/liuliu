@@ -92,5 +92,6 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
         Route::post('/reply/{scene_id}', 'Content\SceneController@reply');
         Route::post('/release', 'Content\SceneController@release');
         Route::get('/replies/{scene_id}', 'Content\SceneController@replies');
+        Route::get('/index', 'Content\SceneController@index');
     });
 });

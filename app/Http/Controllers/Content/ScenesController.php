@@ -26,6 +26,46 @@ use Illuminate\Support\Facades\DB;
 class ScenesController extends Controller
 {
     /**
+     * @api               {get} /api/scene/index 场景
+     *
+     * @apiGroup          场景首页
+     * @apiName           获取场景列表
+     *
+     * @apiVersion        1.0.0
+     *
+     * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     *   {
+     *      "scenes": [
+     *          {
+     *              "id": "1",
+     *              "name": "真人秀",
+     *              "remark": "1",
+     *              "status": "1",
+     *              "reply_counts":"33",
+     *              'reply_users':[{//userinfo}]
+     *          }
+     *          ,//...
+     *      ],
+     *   }
+     */
+    /**
+     *
+     * @return array
+     */
+    public function index()
+    {
+        $scenes = Scene::query()->inRandomOrder()->take(2)
+            ->where('status', Common::STATUS_NORMAL)
+            ->get()->toArray();
+        $scenes = UserInfo::getUserInfoWithList($scenes, 'user_id');
+        $scenes = SceneReply::limitCounts($scenes, 3);
+
+        return [
+            'scenes' => $scenes,
+        ];
+    }
+    /**
      * @api               {get} /api/scenes 场景
      *
      * @apiParam {String} page
