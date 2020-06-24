@@ -248,7 +248,7 @@ class UsersController extends Controller
     /**
      * @api               {get} /api/user/answer/{uid} 用户回答的问题（针对提问）
      * @apiGroup          内容获取
-     * @apiName           用户发布的问题
+     * @apiName           用户回答的问题（针对提问）
      * @apiVersion        1.0.0
      *
      * @apiSuccessExample Success-Response
