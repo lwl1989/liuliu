@@ -11,6 +11,8 @@ use App\Models\Common\Tags;
 use App\Models\Content\Content;
 use App\Models\Content\ContentComment;
 use App\Models\Content\ContentCounts;
+use App\Models\Question\QuestionAppoint;
+use App\Models\Question\QuestionReply;
 use App\Models\Question\Questions;
 use App\Models\RegisterUsers\UserBind;
 use App\Models\RegisterUsers\UserCoach;
@@ -58,37 +60,37 @@ class UsersController extends Controller
      *
      * @return array
      */
-    public function center(Request $request) : array
+    public function center(Request $request): array
     {
         $uid = Auth::id();
 
-        $info = UserInfo::query()->where('user_id',$uid)->first();
+        $info = UserInfo::query()->where('user_id', $uid)->first();
         $tags = UserSubTags::query()->where('user_id', $uid)->get()->toArray();
 
         $fansCount = 0;
         $fans = UserCounts::query()->where('user_id', $uid)->where('typ', Common::USER_OP_BE_FOLLOW)->first(['counts']);
-        if($fans) {
+        if ($fans) {
             $fansCount = ($fans->toArray())['counts'];
         }
 
         $followCount = 0;
         $follows = UserCounts::query()->where('user_id', $uid)->where('typ', Common::USER_OP_FOLLOW)->first(['counts']);
-        if($follows) {
+        if ($follows) {
             $followCount = ($follows->toArray())['counts'];
         }
         $isCoach = 0;
-        $coach = UserCoach::query()->where('user_id', $uid)->where('status',Common::STATUS_NORMAL)->first();
-        if($coach) {
+        $coach = UserCoach::query()->where('user_id', $uid)->where('status', Common::STATUS_NORMAL)->first();
+        if ($coach) {
             $isCoach = 1;
         }
         return [
-            'user'  =>  $info,
-            'tags'  =>  $tags,
-            'counts'    =>  [
+            'user' => $info,
+            'tags' => $tags,
+            'counts' => [
                 Common::USER_OP_BE_FOLLOW => $fansCount,
-                Common::USER_OP_FOLLOW  =>  $followCount
+                Common::USER_OP_FOLLOW => $followCount
             ],
-            'is_coach'  => $isCoach
+            'is_coach' => $isCoach
         ];
     }
     /**
@@ -243,18 +245,84 @@ class UsersController extends Controller
         ];
     }
 
+    /**
+     * @api               {get} /api/user/answer/{uid} 用户回答的问题（针对提问）
+     * @apiGroup          内容获取
+     * @apiName           用户发布的问题
+     * @apiVersion        1.0.0
+     *
+     * @apiSuccessExample Success-Response
+     * {
+     *    "questions":[
+     *          {
+     *                "id":"1",
+     *                    "title":"xxxxx",
+     *                    "content":"xxxxxxxxxxxx",
+     *                    "user":{
+     *                          "user_id":"1",
+     *                          "avatar":"",
+     *                          "nickname":"xxxx"
+     *                      },
+     *                    "counts":{
+     *                      "3":"100",
+     *                      "6":"13567746",
+     *                    },
+     *                  "reply":{//回答信息或者空对象},
+     *                  "replied":"1" //是否回答
+     *          }
+     *      ]
+     * }
+     */
+    /**
+     * @param Request $request
+     *
+     * @return array
+     */
+    public function myAnswer(Request $request): array
+    {
+        $uid = $request->route('uid');
+        $relations = QuestionAppoint::query()
+            ->where('answer_id', $uid)
+            ->orderBy('id', 'desc')
+            ->get()
+            ->toArray();
+
+        $contents = [];
+        if (!empty($relations)) {
+            $questionIds = array_column($relations, 'question_id');
+            $questions = Questions::query()->whereIn('id', $questionIds)->get()->toArray();
+            $contents = UserInfo::getUserInfoWithList($questions);
+            $contents = ContentCounts::getContentsCounts($contents);
+
+            $replies = QuestionReply::query()->whereIn('question_id', $questionIds)->where('user_id', $uid)->where('status', Common::STATUS_NORMAL)->get()->toArray();
+            $replies = array_column($replies, null, 'question_id');
+            foreach ($questions as &$question) {
+                $question['replied'] = '0';
+                $question['reply'] = new \stdClass();
+                if (isset($replies[$question['id']])) {
+                    $question['replied'] = '1';
+                    $question['reply'] = $replies[$question['id']];
+                }
+                unset($question);
+            }
+        }
+
+        return [
+            'questions' => $contents
+        ];
+    }
 
     /**
- * @api               {post} /api/user/follow 关注
- * @apiGroup          用户操作
- * @apiName           关注
- *
- * @apiParam {String} user_id
- * @apiVersion        1.0.0
- *
- * @apiSuccessExample Success-Response:
- *     HTTP/1.1 200 OK
- */
+     * @api               {post} /api/user/follow 关注
+     * @apiGroup          用户操作
+     * @apiName           关注
+     *
+     * @apiParam {String} user_id
+     * @apiVersion        1.0.0
+     *
+     * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     */
     /**
      * @param Request $request
      *
@@ -329,7 +397,7 @@ class UsersController extends Controller
         $exists = UserRelations::query()->where('user_id', $userId)->where('re_user_id', $sudId)
             ->where('typ', 1)->first();
         if (!$exists) {
-           return [];
+            return [];
         } else {
             $exists = $exists->toArray();
             if ($exists['status'] == Common::STATUS_NORMAL) {
@@ -360,13 +428,13 @@ class UsersController extends Controller
      * @param Request $request
      * @return array
      */
-    public function comments(Request $request) : array
+    public function comments(Request $request): array
     {
         $uid = $request->route('uid');
         //todo: 第二级评论回复不展示
-        $comment = ContentComment::query()->where('user_id',$uid)->where('parent_id', 0)->get()->toArray();
+        $comment = ContentComment::query()->where('user_id', $uid)->where('parent_id', 0)->get()->toArray();
         $result = [];
-        if(!empty($comment)) {
+        if (!empty($comment)) {
             $contentIds = array_column($comment, 'content_id');
 
             $contents = Content::query()->whereIn('id', $contentIds)->get()->toArray();
@@ -375,8 +443,8 @@ class UsersController extends Controller
             $contents = array_column($contents, null, 'id');
             foreach ($comment as $item) {
                 $result[] = [
-                    'comment'   =>  $item,
-                    'content'   =>  $contents[$item['content_id']]
+                    'comment' => $item,
+                    'content' => $contents[$item['content_id']]
                 ];
             }
         }
@@ -384,11 +452,11 @@ class UsersController extends Controller
         return $result;
     }
 
-    public function forgeUser(Request $request) : array
+    public function forgeUser(Request $request): array
     {
         $tags = Tags::query()->get()->toArray();
         foreach ($tags as $tag) {
-            for($i=0;$i<2;$i++) {
+            for ($i = 0; $i < 2; $i++) {
                 $openId = Random::randomUuid();
                 $id = Users::query()->insertGetId([
                     'username' => $openId,
