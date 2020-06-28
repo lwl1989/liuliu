@@ -72,6 +72,7 @@ class ContentController extends Controller
      */
     public function detail(Request $request): array
     {
+        $uid = Auth::id();
         $id = $request->get('id');
         if (!$id) {
             return ['code' => ErrorConstant::PARAMS_ERROR, 'response' => '参数错误'];
@@ -126,11 +127,6 @@ class ContentController extends Controller
             $user['is_coach'] = 1;
             $user['job'] = $userCoach['job'];
             $user['real_name'] = $userCoach['real_name'];
-        }
-        try {
-            $uid = Auth::id();
-        } catch (\Exception $exception) {
-            $uid = 0;
         }
         $zan = 0;
         $zanCount = 0;
