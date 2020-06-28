@@ -136,7 +136,7 @@ class ContentController extends Controller
         $zanCount = 0;
         $commentCount = ContentComment::query()->where('content_id', $id)->where('status', Common::STATUS_NORMAL)->count();
         if ($uid > 0) {
-            $exists = UserZan::query()->where('user_id', $uid)->where('typ', 1)->where('obj_id', $id)->first(['id']);
+            $exists = UserZan::query()->where('user_id', $uid)->where('typ', UserZan::UserZanContent)->where('obj_id', $id)->first(['id']);
             if ($exists) {
                 $zan = 1;
             }
