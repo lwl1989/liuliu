@@ -276,7 +276,7 @@ class ScenesController extends Controller
         try {
             $post = $request->input();
             $post['value'] = 1;
-            $params = ArrayParse::checkParamsArray(['name', 'remark', 'user_opinion'], $post);
+            $params = ArrayParse::arrayCopy(['name', 'remark', 'user_opinion'], $post);
             if (isset($params['value'])) {
                 unserialize($params['value']);
             }
