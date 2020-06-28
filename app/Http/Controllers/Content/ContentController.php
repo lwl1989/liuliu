@@ -143,6 +143,7 @@ class ContentController extends Controller
             $zanCount = UserZan::query()->where('typ', 1)->where('obj_id', $id)->count();
         }
         return [
+            'uid'   =>  $uid,
             'content' => $content,
             'resources' => $resources,
             'tags' => $tags,
