@@ -17,7 +17,7 @@ Route::group(['middleware' => ['format']], function () {
     Route::get('wx/login','Auth\WxController@login');
     Route::get('wx/token','Auth\WxController@getToken');
 
-    Route::get('scenes', 'Content\SceneController@page');
+    Route::get('scenes', 'Content\ScenesController@page');
 
     Route::get('question/info/{id}', 'Content\QuestionController@info');
     Route::get('questions', 'Content\QuestionController@timeLine');
@@ -88,10 +88,10 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
     });
 
     Route::group(['prefix'=>'scene'], function (){
-        Route::get('/detail/{scene_id}', 'Content\SceneController@detail');
-        Route::post('/reply/{scene_id}', 'Content\SceneController@reply');
-        Route::post('/release', 'Content\SceneController@release');
-        Route::get('/replies/{scene_id}', 'Content\SceneController@replies');
-        Route::get('/index', 'Content\SceneController@index');
+        Route::get('/detail/{scene_id}', 'Content\ScenesController@detail');
+        Route::post('/reply/{scene_id}', 'Content\ScenesController@reply');
+        Route::post('/release', 'Content\ScenesController@release');
+        Route::get('/replies/{scene_id}', 'Content\ScenesController@replies');
+        Route::get('/index', 'Content\ScenesController@index');
     });
 });
