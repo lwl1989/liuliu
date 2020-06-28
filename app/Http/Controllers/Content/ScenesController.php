@@ -274,7 +274,12 @@ class ScenesController extends Controller
         $uid = Auth::id();
         DB::beginTransaction();
         try {
-            $params = ArrayParse::checkParamsArray(['name', 'remark', 'user_opinion'], $request->input());
+            $post = $request->input();
+            $post['value'] = 1;
+            $params = ArrayParse::checkParamsArray(['name', 'remark', 'user_opinion'], $post);
+            if (isset($params['value'])) {
+                unserialize($params['value']);
+            }
             $params['user_id'] = $uid;
             $typ = Common::USER_OP_RELEASE_SCENE;
             $cid = Scene::query()->insertGetId($params);
