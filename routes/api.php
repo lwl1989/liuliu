@@ -76,8 +76,8 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
 
     Route::group(['prefix'=>'scene'], function (){
         Route::get('/detail/{scene_id}', 'Content\ScenesController@detail');
-        Route::post('/reply/{scene_id}', 'Content\ScenesController@reply');
         Route::post('/release', 'Content\ScenesController@release');
+        Route::put('/reply/{scene_id}', 'Content\ScenesController@reply');
         Route::get('/replies/{scene_id}', 'Content\ScenesController@replies');
         Route::get('/index', 'Content\ScenesController@index');
     });
