@@ -375,7 +375,7 @@ class UsersController extends Controller
      * @apiGroup          用户操作
      * @apiName           取消关注
      *
-     * @apiParam {String} content
+     * @apiParam {String} user_id
      * @apiVersion        1.0.0
      *
      * @apiSuccessExample Success-Response:
