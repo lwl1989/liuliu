@@ -206,7 +206,7 @@ class TopicController
      * @apiParam {String} title 话题标题
      *
      * @apiSuccessExample Success-Response
-     *
+     *      HTTP/1.1 200 OK
      */
     /**
      * @param Request $request
@@ -248,7 +248,7 @@ class TopicController
      * @apiParam {String} topic_id 话题id
      *
      * @apiSuccessExample Success-Response
-     *
+     *      HTTP/1.1 200 OK
      */
     /**
      * @param Request $request
@@ -293,6 +293,7 @@ class TopicController
      * @apiParam {String} topic_id 话题id
      *
      * @apiSuccessExample Success-Response
+     *  HTTP/1.1 200 OK
      */
     /**
      * @param Request $request
