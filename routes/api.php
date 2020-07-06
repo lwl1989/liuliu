@@ -53,7 +53,7 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
 
 
     Route::group(['prefix' => 'content'],function (){
-        //Route::post('comment', 'Content\ContentController@comment');
+        Route::post('comment', 'Content\CommentController@comment');
         Route::post('release', 'Content\ContentController@release');
 
 
