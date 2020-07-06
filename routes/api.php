@@ -39,7 +39,7 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
         Route::post('comment', 'Content\CommentController@comment');
         Route::post('release', 'Content\ContentController@release');
         Route::get('/detail','Content\ContentController@detail');
-        Route::get('/comments','Content\CommentController@detail');
+        Route::get('/comments','Content\CommentController@all');
 
         Route::get('/', 'Content\ContentController@myList');
 
