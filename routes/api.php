@@ -60,6 +60,7 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
         Route::get('comments/{uid}', 'Users\UsersController@comments');
         Route::get('question/{uid}', 'Users\UsersController@questions');
         Route::get('questions/{uid}', 'Users\UsersController@questions');
+        Route::get('topics/{uid}', 'Users\UsersController@topics');
         Route::get('answer/{uid}', 'Users\UsersController@myAnswer');
         Route::post('center', 'Users\UsersController@center');
         Route::post('follow', 'Users\UsersController@follow');
@@ -92,10 +93,13 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
     Route::group(['prefix'=>'topic'], function (){
         Route::get('recommend','Content\TopicController@recommend');
         Route::get('info/{id}','Content\TopicController@info');
+        Route::get('release','Content\TopicController@release');
+        Route::post('follow', 'Content\TopicController@follow');
+        Route::post('unfollow', 'Content\TopicController@unFollow');
     });
 
+    Route::get('topics','Content\TopicController@page');
     Route::get('scenes', 'Content\ScenesController@page');
-
     Route::get('questions', 'Content\QuestionController@timeLine');
     Route::get('tags', 'Common\TagsController@getAll');
 

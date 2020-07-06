@@ -11,6 +11,7 @@ use App\Models\Common\Tags;
 use App\Models\Content\Content;
 use App\Models\Content\ContentComment;
 use App\Models\Content\ContentCounts;
+use App\Models\Content\Topics;
 use App\Models\Question\QuestionAppoint;
 use App\Models\Question\QuestionReply;
 use App\Models\Question\Questions;
@@ -23,6 +24,7 @@ use App\Models\RegisterUsers\UserOpLog;
 use App\Models\RegisterUsers\UserRelations;
 use App\Models\RegisterUsers\Users;
 use App\Models\RegisterUsers\UserSubTags;
+use App\Models\RegisterUsers\UserTopic;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -492,5 +494,50 @@ class UsersController extends Controller
         }
 
         return [];
+    }
+
+
+    /**
+     * @api               {get} /api/user/topics/{uid} 我关注的教练
+     * @apiGroup          内容获取
+     * @apiName           我关注的教练
+     * @apiVersion        1.0.0
+     *
+     * @apiSuccessExample Success-Response
+     * [
+     *     {
+     *                  "user_id": "1",
+     *                  "nickname": "休息休息",
+     *                  "avatar": "https://xxxxxx/",
+     *    },//...
+     * ]
+     */
+    /**
+     * @param Request $request
+     *
+     * @return array
+     */
+    public function topics(Request $request): array
+    {
+        $uid = $request->route('uid');
+
+        $relations = UserTopic::query()
+            ->where('user_id', $uid)
+            ->where('status', Common::STATUS_NORMAL)
+            ->get()
+            ->toArray();
+
+        if (empty($relations)) {
+            return ['topics' => []];
+        }
+
+        $topicIds = array_column($relations, 'topic_id');
+        $topics = Topics::query()->whereIn('id', $topicIds)->get()->toArray();
+
+        foreach ($topics as &$topic) {
+            $topic['followed'] = 1;
+            unset($topic);
+        }
+        return ['topics' => $topics];
     }
 }
