@@ -111,7 +111,10 @@ class CommentController extends Controller
         if (!empty($comments)) {
             $comments = UserInfo::getUserInfoWithList($comments);
             $commentIds = array_column($comments, 'id');
-            $zanCount = UserZan::query()->where('typ', 2)->where('obj_id', $commentIds)->groupBy('obj_id')->get(['count(*) as count', 'obj_id'])->toArray();
+            $zanCount = UserZan::query()->where('typ', 2)
+                ->where('obj_id', $commentIds)
+                ->groupBy('obj_id')
+                ->selectRaw('count(*) as count, obj_id')->toArray();
             foreach ($comments as &$comment) {
                 $comment['zanCount'] = 0;
                 foreach ($zanCount as $item) {
