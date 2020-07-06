@@ -219,8 +219,9 @@ class ScenesController extends Controller
         if (!empty($replies)) {
             $zanCount = UserZan::query()->where('typ', UserZan::UserZanScene)
                 ->whereIn('obj_id', array_column($replies, 'user_id'))
-                ->groupBy('obj_id')->get(['count(*)', 'obj_id'])->toArray();
-            $zanCount = array_column($zanCount, 'count(*)', 'obj_id');
+                ->selectRaw('count(*) as count, obj_id')
+                ->groupBy('obj_id')->get()->toArray();
+            $zanCount = array_column($zanCount, 'count', 'obj_id');
             $replies = UserInfo::getUserInfoWithList($replies, 'user_id');
 
 

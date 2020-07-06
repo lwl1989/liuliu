@@ -30,7 +30,7 @@ class SceneReply extends Model
 
         $ids = array_column($list, 'id');
         $replyCounts = self::query()->whereIn('scene_id', $ids)->where('status',Common::STATUS_NORMAL)
-            ->select(['count(*) as count','scene_id'])->groupBy('scene_id')->get()->toArray();
+            ->selectRaw('count(*) as count,scene_id')->groupBy('scene_id')->get()->toArray();
         $replyCounts = array_column($replyCounts, 'count', 'scene_id');
         foreach ($list as $index => $item) {
             $list[$index]['reply_counts'] = 0;
