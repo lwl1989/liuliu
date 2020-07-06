@@ -129,7 +129,7 @@ class UsersController extends Controller
         }
 
         $userIds = array_column($relations, 're_user_id');
-        $coaches = Users::query()->whereIn('id', $userIds)->get()->toArray();
+        $coaches = Users::query()->select(['username','id','typ'])->whereIn('id', $userIds)->get()->toArray();
 
         return ['coaches' => $coaches];
     }
