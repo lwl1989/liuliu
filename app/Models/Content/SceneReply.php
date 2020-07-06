@@ -40,7 +40,7 @@ class SceneReply extends Model
         }
         if ($replyUserGet > 0) {
             $replies = self::query()->whereIn('scene_id', $ids)->where('status',Common::STATUS_NORMAL)
-                ->select('user_id,scene_id')->get()->toArray();
+                ->select(['user_id','scene_id'])->get()->toArray();
             $replies = array_column($replies, 'user_id', 'scene_id');
             $replyUserIds = array_column($replies, 'user_id');
             $replyUserIds = array_unique($replyUserIds);
