@@ -251,7 +251,7 @@ class ScenesController extends Controller
     }
 
     /**
-     * @api               {get} /api/scene/reply/release 发布场景
+     * @api               {get} /api/scene/release 发布场景
      *
      * @apiGroup          场景
      * @apiName           发布场景
@@ -274,7 +274,8 @@ class ScenesController extends Controller
         $uid = Auth::id();
         DB::beginTransaction();
         try {
-            $params = ArrayParse::checkParamsArray(['name', 'remark', 'user_opinion'], $request->input());
+            $post = $request->input();
+            $params = ArrayParse::checkParamsArray(['name', 'remark', 'user_opinion'], $post);
             $params['user_id'] = $uid;
             $typ = Common::USER_OP_RELEASE_SCENE;
             $cid = Scene::query()->insertGetId($params);
@@ -294,7 +295,7 @@ class ScenesController extends Controller
     }
 
     /**
-     * @api               {get} /api/scene/reply/{scene_id} 发布场景意见
+     * @api               {post} /api/scene/reply/{scene_id} 发布场景意见
      *
      * @apiGroup          场景
      * @apiName           发布场景意见

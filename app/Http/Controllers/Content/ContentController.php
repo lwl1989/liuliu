@@ -72,6 +72,7 @@ class ContentController extends Controller
      */
     public function detail(Request $request): array
     {
+        $uid = Auth::id();
         $id = $request->get('id');
         if (!$id) {
             return ['code' => ErrorConstant::PARAMS_ERROR, 'response' => '参数错误'];
@@ -127,22 +128,18 @@ class ContentController extends Controller
             $user['job'] = $userCoach['job'];
             $user['real_name'] = $userCoach['real_name'];
         }
-        try {
-            $uid = Auth::id();
-        } catch (\Exception $exception) {
-            $uid = 0;
-        }
         $zan = 0;
         $zanCount = 0;
         $commentCount = ContentComment::query()->where('content_id', $id)->where('status', Common::STATUS_NORMAL)->count();
         if ($uid > 0) {
-            $exists = UserZan::query()->where('user_id', $uid)->where('typ', 1)->where('obj_id', $id)->first(['id']);
+            $exists = UserZan::query()->where('user_id', $uid)->where('typ', UserZan::UserZanContent)->where('obj_id', $id)->first(['id']);
             if ($exists) {
                 $zan = 1;
             }
             $zanCount = UserZan::query()->where('typ', 1)->where('obj_id', $id)->count();
         }
         return [
+            'uid'   =>  $uid,
             'content' => $content,
             'resources' => $resources,
             'tags' => $tags,

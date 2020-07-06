@@ -17,26 +17,9 @@ Route::group(['middleware' => ['format']], function () {
     Route::get('wx/login','Auth\WxController@login');
     Route::get('wx/token','Auth\WxController@getToken');
 
-    Route::get('scenes', 'Content\SceneController@page');
 
-    Route::get('question/info/{id}', 'Content\QuestionController@info');
-    Route::get('questions', 'Content\QuestionController@timeLine');
-    Route::get('tags', 'Common\TagsController@getAll');
 
-    Route::group(['prefix'=>'topic'], function (){
-        Route::get('recommend','Content\TopicController@recommend');
-        Route::get('info/{id}','Content\TopicController@info');
-    });
 
-    Route::group(['prefix' => 'content'],function (){
-        Route::get('/detail','Content\ContentController@detail');
-        Route::get('/comments','Content\CommentController@detail');
-    });
-    Route::group(['prefix'=>'recommend'], function (){
-        Route::get('/content','Content\ContentController@recommend');
-        Route::get('/coach','Users\UserCoachController@recommend');
-        Route::get('/topic','Content\TopicController@recommend');
-    });
 });
 
 Route::group(['middleware' => ['format','auth:c_api']], function () {
@@ -55,7 +38,8 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
     Route::group(['prefix' => 'content'],function (){
         Route::post('comment', 'Content\CommentController@comment');
         Route::post('release', 'Content\ContentController@release');
-
+        Route::get('/detail','Content\ContentController@detail');
+        Route::get('/comments','Content\CommentController@detail');
 
         Route::get('/', 'Content\ContentController@myList');
 
@@ -66,6 +50,8 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
     Route::group(['prefix' => 'question'],function (){
         Route::post('release', 'Content\QuestionController@release');
         Route::post('answer', 'Content\QuestionController@answer');
+        Route::get('/info/{id}', 'Content\QuestionController@info');
+
     });
 
     Route::group(['prefix' => 'user'],function (){
@@ -89,10 +75,27 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
     });
 
     Route::group(['prefix'=>'scene'], function (){
-        Route::get('/detail/{scene_id}', 'Content\SceneController@detail');
-        Route::post('/reply/{scene_id}', 'Content\SceneController@reply');
-        Route::post('/release', 'Content\SceneController@release');
-        Route::get('/replies/{scene_id}', 'Content\SceneController@replies');
-        Route::get('/index', 'Content\SceneController@index');
+        Route::get('/detail/{scene_id}', 'Content\ScenesController@detail');
+        Route::post('/release', 'Content\ScenesController@release');
+        Route::post('/reply/{scene_id}', 'Content\ScenesController@reply');
+        Route::get('/replies/{scene_id}', 'Content\ScenesController@replies');
+        Route::get('/index', 'Content\ScenesController@index');
     });
+
+    Route::group(['prefix'=>'recommend'], function (){
+        Route::get('/content','Content\ContentController@recommend');
+        Route::get('/coach','Users\UserCoachController@recommend');
+        Route::get('/topic','Content\TopicController@recommend');
+    });
+
+    Route::group(['prefix'=>'topic'], function (){
+        Route::get('recommend','Content\TopicController@recommend');
+        Route::get('info/{id}','Content\TopicController@info');
+    });
+
+    Route::get('scenes', 'Content\ScenesController@page');
+
+    Route::get('questions', 'Content\QuestionController@timeLine');
+    Route::get('tags', 'Common\TagsController@getAll');
+
 });

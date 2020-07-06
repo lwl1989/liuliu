@@ -14,6 +14,7 @@ use App\Library\Auth\Encrypt;
 use App\Models\RegisterUsers\UserBind;
 use App\Models\RegisterUsers\UserInfo;
 use App\Models\RegisterUsers\Users;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Library\Wxxcx;
@@ -138,10 +139,11 @@ class WxController extends Controller
         return [];
     }
 
-    public function getToken(): array
+    public function getToken(Request $request): array
     {
+        $uid =  $request->query('uid', 1);
         $res = Encrypt::generateToken([
-            'uid' => 1,
+            'uid' => $uid,
             'device_uuid' => 123
         ]);
         return [
