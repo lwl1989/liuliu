@@ -104,6 +104,8 @@ class ScenesController extends Controller
         $sort = $request->get('sort', 'time');
         if ($sort != 'time') {
             $sort = 'sort';
+        }else{
+            $sort = 'update_time';
         }
 
         $scenes = Scene::query()

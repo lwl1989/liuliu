@@ -59,6 +59,7 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
         Route::get('contents/{uid}', 'Users\UsersController@contents');
         Route::get('comments/{uid}', 'Users\UsersController@comments');
         Route::get('question/{uid}', 'Users\UsersController@questions');
+        Route::get('questions/{uid}', 'Users\UsersController@questions');
         Route::get('answer/{uid}', 'Users\UsersController@myAnswer');
         Route::post('center', 'Users\UsersController@center');
         Route::post('follow', 'Users\UsersController@follow');
