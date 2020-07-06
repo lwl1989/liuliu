@@ -33,7 +33,7 @@ class UserRelations extends Model
                 $res[$userId] = 1;
             }
         }
-        var_dump($res, $relations);
+        var_dump($res, $relations,$userId, $userIds);
         return $res;
     }
 }
