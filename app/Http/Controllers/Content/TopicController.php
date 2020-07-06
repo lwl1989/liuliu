@@ -25,9 +25,9 @@ class TopicController
 {
 
     /**
-     * @api               {get} /api/topics 首页推荐话题
-     * @apiGroup          首页数据
-     * @apiName           推荐话题
+     * @api               {get} /api/topics 话题列表
+     * @apiGroup          话题
+     * @apiName           话题列表
      * @apiParam {String} page
      * @apiParam {String} limit
      * @apiParam {String} sort   排序 follow | time
