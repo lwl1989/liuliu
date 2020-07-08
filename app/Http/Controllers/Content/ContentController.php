@@ -341,6 +341,10 @@ class ContentController extends Controller
         $result = UserInfo::getUserInfoWithList($result);
         $result = ContentCounts::getContentsCounts($result);
 
+        foreach ($result as &$item) {
+            $item['resources'] = Resources::query()->where('content_id', $item['id'])->where('status', Common::STATUS_NORMAL)->get()->toArray();
+            unset($item);
+        }
         return [
             'contents' => $result
         ];

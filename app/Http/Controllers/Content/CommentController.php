@@ -106,7 +106,7 @@ class CommentController extends Controller
             return ['code' => ErrorConstant::PARAMS_ERROR, 'response' => 'id错误'];
         }
 
-        $comments = ContentComment::query()->where('parent_id', 0)->where('status', Common::STATUS_NORMAL)->get()->toArray();
+        $comments = ContentComment::query()->where('id', $id)->where('parent_id', 0)->where('status', Common::STATUS_NORMAL)->get()->toArray();
 
         if (!empty($comments)) {
             $comments = UserInfo::getUserInfoWithList($comments);
@@ -125,11 +125,8 @@ class CommentController extends Controller
                 unset($comment);
             }
 
-            try {
-                $uid = Auth::id();
-            } catch (\Exception $e) {
-                $uid = 0;
-            }
+
+            $uid = Auth::id();
             if ($uid > 0) {
                 $exists = UserZan::query()->where('typ', 2)->where('obj_id', $commentIds)->where('user_id', $uid)->get(['id', 'user_id', 'obj_id'])->toArray();
                 foreach ($comments as &$comment) {

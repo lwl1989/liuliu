@@ -322,7 +322,7 @@ class ScenesController extends Controller
             $params = ArrayParse::checkParamsArray(['value'], $request->input());
             $params['user_id'] = $uid;
             $typ = Common::USER_OP_REPLY_SCENE;
-            $cid = Scene::query()->insertGetId($params);
+            $cid = SceneReply::query()->insertGetId($params);
 
             UserCounts::incrementOrCreate($uid, $typ);
             UserOpLog::query()->insert([
