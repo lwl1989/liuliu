@@ -23,6 +23,7 @@ use App\Models\RegisterUsers\UserCoach;
 use App\Models\RegisterUsers\UserCounts;
 use App\Models\RegisterUsers\UserInfo;
 use App\Models\RegisterUsers\UserOpLog;
+use App\Models\RegisterUsers\UserRelations;
 use App\Models\RegisterUsers\Users;
 use App\Models\RegisterUsers\UserZan;
 use App\Services\ContentService;
@@ -121,7 +122,19 @@ class ContentController extends Controller
         $user['is_coach'] = 0;
         $user['job'] = '';
         $user['real_name'] = '';
-        $userCoach = UserCoach::query()->where('user_id', $content['user_id'])->where('status', Common::STATUS_NORMAL)->first();
+        $user['followed'] = '0';
+        $userCoach = UserCoach::query()
+            ->where('user_id', $content['user_id'])
+            ->where('status', Common::STATUS_NORMAL)
+            ->first();
+        $relation = UserRelations::query()
+            ->where('re_user_id', $content['user_id'])
+            ->where('user_id', $uid)
+            ->where('status', Common::STATUS_NORMAL)
+            ->first();
+        if($relation) {
+            $user['followed'] = '1';
+        }
         if ($userCoach) {
             $userCoach = $userCoach->toArray();
             $user['is_coach'] = 1;
@@ -147,7 +160,7 @@ class ContentController extends Controller
             'user' => $user,
             'zan' => $zan,
             'zanCount' => $zanCount,
-            'commentCount' => $commentCount
+            'commentCount' => $commentCount,
         ];
     }
 
