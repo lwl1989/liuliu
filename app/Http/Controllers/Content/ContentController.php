@@ -57,7 +57,8 @@ class ContentController extends Controller
      *          //用户属性
      *          'is_coach':1,
      *          'job':'xxx',
-     *          'real_name':'xxx'
+     *          'real_name':'xxx',
+     *          'followed':'1'
      *         },
      *      "tags":[{"id":"1","name":"ojbk"}],
      *      "topics":[{"id":"1","name":"ojbk"}],
