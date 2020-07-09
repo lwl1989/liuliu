@@ -93,7 +93,7 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
     Route::group(['prefix'=>'topic'], function (){
         Route::get('recommend','Content\TopicController@recommend');
         Route::get('info/{id}','Content\TopicController@info');
-        Route::get('release','Content\TopicController@release');
+        Route::post('release','Content\TopicController@release');
         Route::post('follow', 'Content\TopicController@follow');
         Route::post('unfollow', 'Content\TopicController@unFollow');
     });
