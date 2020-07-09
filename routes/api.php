@@ -96,6 +96,7 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
         Route::post('release','Content\TopicController@release');
         Route::post('follow', 'Content\TopicController@follow');
         Route::post('unfollow', 'Content\TopicController@unFollow');
+        Route::get('contents', 'Content\ContentController@topicContents');
     });
 
     Route::get('topics','Content\TopicController@page');

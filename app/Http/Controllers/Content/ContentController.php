@@ -81,7 +81,7 @@ class ContentController extends Controller
         }
 
         $content = Content::query()->where('id', $id)->first();
-        if(!$content) {
+        if (!$content) {
             return ['code' => ErrorConstant::PARAMS_ERROR, 'response' => '参数错误'];
         }
 
@@ -133,7 +133,7 @@ class ContentController extends Controller
             ->where('user_id', $uid)
             ->where('status', Common::STATUS_NORMAL)
             ->first();
-        if($relation) {
+        if ($relation) {
             $user['followed'] = '1';
         }
         if ($userCoach) {
@@ -153,7 +153,7 @@ class ContentController extends Controller
             $zanCount = UserZan::query()->where('typ', 1)->where('obj_id', $id)->count();
         }
         return [
-            'uid'   =>  $uid,
+            'uid' => $uid,
             'content' => $content,
             'resources' => $resources,
             'tags' => $tags,
@@ -314,7 +314,59 @@ class ContentController extends Controller
         ];
     }
 
+    /**
+     * @api               {get} /api/topic/contents 话题内容
+     *
+     * @apiParam {String} topic_id
+     * @apiParam {String} page
+     * @apiParam {String} limit
+     * @apiGroup          话题
+     * @apiName           话题内容
+     *
+     * @apiVersion        1.0.0
+     *
+     * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     *   {
+     *      "contents": [
+     *          {
+     *              'content':{
+     *              "id": "1",
+     *              "name": "真人秀",
+     *              "sort": "1",
+     *              "status": "1",
+     *              "create_time": "1588069984",
+     *              "update_time": "1588069984"
+     *              },
+     *              'user':{//userinfo}
+     *          }
+     *          ,//...
+     *      ],
+     *   }
+     */
+    public function topicContents(Request $request)
+    {
+        $tagId = $request->get('topic_id', 0);
+        if (!$tagId) {
+            $tagId = -2;
+        }
+        $page = $request->get('page', 1);
+        $limit = $request->get('limit', 15);
 
+        $result = [];
+
+        //todo:先期每个条目最多200条，没那么多人划那么多条，按发布时间逆序即可
+        $contentBind = ContentTags::query()->where('relation_id', $tagId)->where('typ', 2)->orderBy('id', 'desc')->limit(200)->get()->toArray();
+        if (!empty($contentBind)) {
+            $contentIds = array_column($contentBind, 'content_id');
+            $result = ContentService::getContentListView($contentIds, ($page - 1) * $limit, $limit);
+        }
+
+
+        return [
+            'contents' => $result
+        ];
+    }
     /**
      * @api               {get} /api/recommend/content 频道内容列表
      *
