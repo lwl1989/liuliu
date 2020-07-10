@@ -61,7 +61,7 @@ class ZanController extends Controller
                 'typ' => $typ
             ]);
             ContentCounts::incrementOrCreate($cid, $opTyp);
-            ContentCounts::incrementOrCreate($cid, Common::USER_OP_BE_COMMENT);
+            ContentCounts::incrementOrCreate($cid, Common::USER_OP_BE_ZAN);
             //UserCounts::incrementOrCreate($uid, $opTyp);
             UserOpLog::query()->insert([
                 'user_id' => $uid,

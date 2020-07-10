@@ -59,7 +59,7 @@ class CommentController extends Controller
             ]);
 
             $typ = Common::USER_OP_COMMENT;
-            ContentCounts::incrementOrCreate($cid, $typ);
+            ContentCounts::incrementOrCreate($cid, Common::USER_OP_BE_COMMENT);
             UserCounts::incrementOrCreate($uid, $typ);
             UserOpLog::query()->insert([
                 'user_id' => $uid,
