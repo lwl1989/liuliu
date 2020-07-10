@@ -414,9 +414,9 @@ class UsersController extends Controller
     }
 
     /**
-     * @api               {get} /api/user/comments/:uid 评论文章
+     * @api               {get} /api/user/comments/:uid 我的评论
      * @apiGroup          内容操作
-     * @apiName           评论文章
+     * @apiName           我的评论
      *
      * @apiParam {String} content
      * @apiParam {String} cid  文章id
