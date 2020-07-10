@@ -76,7 +76,7 @@ class CommentController extends Controller
     /**
      * @api               {get} /api/content/comments 获取评论列表
      *
-     * @apiParam {String} id 内容id
+     * @apiParam {String} id 内容cid
      * @apiGroup          内容获取
      * @apiName           获取评论列表
      *
@@ -106,7 +106,7 @@ class CommentController extends Controller
             return ['code' => ErrorConstant::PARAMS_ERROR, 'response' => 'id错误'];
         }
 
-        $comments = ContentComment::query()->where('id', $id)->where('parent_id', 0)->where('status', Common::STATUS_NORMAL)->get()->toArray();
+        $comments = ContentComment::query()->where('cid', $id)->where('parent_id', 0)->where('status', Common::STATUS_NORMAL)->get()->toArray();
 
         if (!empty($comments)) {
             $comments = UserInfo::getUserInfoWithList($comments);
