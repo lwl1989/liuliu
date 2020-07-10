@@ -500,9 +500,9 @@ class UsersController extends Controller
 
 
     /**
-     * @api               {get} /api/user/topics/{uid} 我关注的教练
+     * @api               {get} /api/user/topics/{uid} 我参与的话题
      * @apiGroup          用户中心
-     * @apiName           我关注的教练
+     * @apiName           我参与的话题
      * @apiVersion        1.0.0
      *
      * @apiSuccessExample Success-Response
@@ -546,9 +546,9 @@ class UsersController extends Controller
     }
 
     /**
-     * @api               {get} /api/user/scenes/{uid} 我关注的教练
+     * @api               {get} /api/user/scenes/{uid} 我参与的场景
      * @apiGroup          用户中心
-     * @apiName           我关注的教练
+     * @apiName           我参与的场景
      * @apiVersion        1.0.0
      *
      * @apiSuccessExample Success-Response
