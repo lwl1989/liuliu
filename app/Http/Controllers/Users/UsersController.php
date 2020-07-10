@@ -11,6 +11,8 @@ use App\Models\Common\Tags;
 use App\Models\Content\Content;
 use App\Models\Content\ContentComment;
 use App\Models\Content\ContentCounts;
+use App\Models\Content\Scene;
+use App\Models\Content\SceneReply;
 use App\Models\Content\Topics;
 use App\Models\Question\QuestionAppoint;
 use App\Models\Question\QuestionReply;
@@ -32,7 +34,7 @@ class UsersController extends Controller
 {
     /**
      * @api               {get} /api/user/center 个人中心上半部
-     * @apiGroup          内容获取
+     * @apiGroup          用户中心
      * @apiName           个人中心上半部
      *
      * @apiVersion        1.0.0
@@ -97,7 +99,7 @@ class UsersController extends Controller
     }
     /**
      * @api               {get} /api/user/follows/{uid} 我关注的教练
-     * @apiGroup          内容获取
+     * @apiGroup          用户中心
      * @apiName           我关注的教练
      * @apiVersion        1.0.0
      *
@@ -138,7 +140,7 @@ class UsersController extends Controller
 
     /**
      * @api               {get} /api/user/contents/{uid} 我的feed流
-     * @apiGroup          内容获取
+     * @apiGroup          用户中心
      * @apiName           我的feed流
      * @apiVersion        1.0.0
      *
@@ -200,7 +202,7 @@ class UsersController extends Controller
 
     /**
      * @api               {get} /api/user/questions/{uid} 用户发布的问题
-     * @apiGroup          内容获取
+     * @apiGroup          用户中心
      * @apiName           用户发布的问题
      * @apiVersion        1.0.0
      *
@@ -249,7 +251,7 @@ class UsersController extends Controller
 
     /**
      * @api               {get} /api/user/answer/{uid} 用户回答的问题（针对提问）
-     * @apiGroup          内容获取
+     * @apiGroup          用户中心
      * @apiName           用户回答的问题（针对提问）
      * @apiVersion        1.0.0
      *
@@ -499,16 +501,18 @@ class UsersController extends Controller
 
     /**
      * @api               {get} /api/user/topics/{uid} 我关注的教练
-     * @apiGroup          内容获取
+     * @apiGroup          用户中心
      * @apiName           我关注的教练
      * @apiVersion        1.0.0
      *
      * @apiSuccessExample Success-Response
      * [
+     *      "topics":
      *     {
-     *                  "user_id": "1",
-     *                  "nickname": "休息休息",
-     *                  "avatar": "https://xxxxxx/",
+     *                  "id": "1",
+     *                  "title": "休息休息",
+     *                  "follow": "https://xxxxxx/",
+     *                  "followed":"1"
      *    },//...
      * ]
      */
@@ -540,4 +544,55 @@ class UsersController extends Controller
         }
         return ['topics' => $topics];
     }
+
+    /**
+     * @api               {get} /api/user/scenes/{uid} 我关注的教练
+     * @apiGroup          用户中心
+     * @apiName           我关注的教练
+     * @apiVersion        1.0.0
+     *
+     * @apiSuccessExample Success-Response
+     * [
+     *      "scenes":
+     *     {
+     *                  "user_id": "1",
+     *                  "name": "休息休息",
+     *                  "avatar": "https://xxxxxx/",
+     *                  "user_opinion":"dasds",
+     *    },//...
+     * ]
+     */
+    /**
+     * @param Request $request
+     *
+     * @return array
+     */
+    public function scenes(Request $request): array
+    {
+        $uid = $request->route('uid');
+
+        $scenes = SceneReply::query()
+            ->where('user_id', $uid)
+            ->where('status', Common::STATUS_NORMAL)
+            ->get()
+            ->toArray();
+
+        if (empty($scenes)) {
+            return ['scenes' => []];
+        }
+
+        $sceneReCount = SceneReply::query()->whereIn('scene_id', array_column($scenes, 'scene_id'))
+            ->where('status', Common::STATUS_NORMAL)->selectRaw('scene_id,count(*) as count')->groupBy('scene_id')->get()->toArray();
+        $sceneReCount = array_column($sceneReCount, 'count', 'scene_id');
+        foreach ($scenes as &$scene) {
+            $scene['reply_count'] = 0;
+            if(isset($sceneReCount[$scene['scene_id']])) {
+                $scene['reply_count'] = $sceneReCount[$scene['id']];
+            }
+            unset($topic);
+        }
+        return ['scenes' => $scenes];
+    }
+
+
 }
