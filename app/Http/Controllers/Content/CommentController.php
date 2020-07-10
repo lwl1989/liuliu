@@ -106,7 +106,7 @@ class CommentController extends Controller
             return ['code' => ErrorConstant::PARAMS_ERROR, 'response' => 'id错误'];
         }
 
-        $comments = ContentComment::query()->where('cid', $id)->where('parent_id', 0)->where('status', Common::STATUS_NORMAL)->get()->toArray();
+        $comments = ContentComment::query()->where('content_id', $id)->where('parent_id', 0)->where('status', Common::STATUS_NORMAL)->get()->toArray();
 
         if (!empty($comments)) {
             $comments = UserInfo::getUserInfoWithList($comments);
