@@ -133,7 +133,7 @@ class UsersController extends Controller
         }
 
         $userIds = array_column($relations, 're_user_id');
-        $coaches = Users::query()->select(['username','id','typ'])->whereIn('id', $userIds)->get()->toArray();
+        $coaches = Users::query()->select(['username', 'id', 'typ'])->whereIn('id', $userIds)->get()->toArray();
 
         return ['coaches' => $coaches];
     }
@@ -559,6 +559,8 @@ class UsersController extends Controller
      *                  "name": "休息休息",
      *                  "avatar": "https://xxxxxx/",
      *                  "user_opinion":"dasds",
+     *                  "self_value":"xxxx", //我的意见
+     *
      *    },//...
      * ]
      */
@@ -571,24 +573,33 @@ class UsersController extends Controller
     {
         $uid = $request->route('uid');
 
-        $scenes = SceneReply::query()
+        $scenesReply = SceneReply::query()
+            ->select(['scene_id', 'value'])
             ->where('user_id', $uid)
             ->where('status', Common::STATUS_NORMAL)
             ->get()
             ->toArray();
 
-        if (empty($scenes)) {
+        if (empty($scenesReply)) {
             return ['scenes' => []];
         }
 
-        $sceneReCount = SceneReply::query()->whereIn('scene_id', array_column($scenes, 'scene_id'))
+        $scenes = Scene::query()->whereIn('id', array_column($scenesReply, 'scene_id'))
+            ->where('status', Common::STATUS_NORMAL)->get()->toArray();
+        if (empty($scenes)) {
+            return ['scenes' => []];
+        }
+        $sceneReCount = SceneReply::query()->whereIn('scene_id', array_column($scenes, 'id'))->where('status', Common::STATUS_NORMAL)
             ->where('status', Common::STATUS_NORMAL)->selectRaw('scene_id,count(*) as count')->groupBy('scene_id')->get()->toArray();
         $sceneReCount = array_column($sceneReCount, 'count', 'scene_id');
+        $scenesReply = array_column($scenesReply, 'value', 'scene_id');
+
         foreach ($scenes as &$scene) {
             $scene['reply_count'] = 0;
-            if(isset($sceneReCount[$scene['scene_id']])) {
+            if (isset($sceneReCount[$scene['id']])) {
                 $scene['reply_count'] = $sceneReCount[$scene['id']];
             }
+            $scene['self_value'] = $scenesReply[$scene['id']];
             unset($topic);
         }
         return ['scenes' => $scenes];
