@@ -39,6 +39,8 @@ class ContentCounts extends Model
         }
 
         $listIds = array_column($list, 'id');
+        var_dump($listIds);
+        exit();
         $ccs = ContentCounts::query()->whereIn('content_id', $listIds)->whereIn('typ', $types)->get()->toArray();
        // var_dump($ccs);
         foreach ($list as &$item) {
