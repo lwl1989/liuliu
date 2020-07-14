@@ -606,4 +606,72 @@ class UsersController extends Controller
     }
 
 
+    /**
+     * @api               {get} /api/user/coaches/{uid} 我关注的教练
+     * @apiGroup          用户中心
+     * @apiName           我关注的教练
+     * @apiVersion        1.0.0
+     *
+     * @apiSuccessExample Success-Response
+     * [
+     *     {
+     *                  "join_time":"2020-04-20 12:12:12",
+     *                  "tags"  :   [
+     *                          {"id":"1","name":"教练标签"},//...
+     *                  ],
+     *                    "intro":"dsadasdsa",
+     *                    "desc":"dasfghfdsfgdfgfhdg",
+     *                    "user":{
+     *                          "user_id":"111",
+     *                          "nickname":"dsadsad",
+     *                          "avatar":"erfgh"
+     *                      },
+     *                    "followed":"0" //0未关注  1已关注
+     *
+     *     }, //......
+     */
+    /**
+     * @param Request $request
+     *
+     * @return array
+     */
+    public function coaches(Request $request): array
+    {
+        $uid = $request->route('uid');
+        $coachIds = UserRelations::query()->where('user_id', $uid)->where('status', Common::STATUS_NORMAL)
+            ->where('typ', 1)->get()->toArray();
+        if (empty($coachIds)) {
+            return ['coaches' => []];
+        }
+        $coachIds = array_column($coachIds, 're_user_id');
+        $coaches = UserCoach::query()->whereIn('id', $coachIds)->where('status', Common::STATUS_NORMAL)->get()->toArray();
+        if (empty($coaches)) {
+            return ['coaches' => []];
+        }
+
+        $userIds = array_column($coaches, 'user_id');
+        $coachTags = UserCoachTags::query()->whereIn('coach_id', $coachIds)->get()->toArray();
+        $tagsIds = array_column($coachTags, 'tag_id');
+        $tags = Tags::query()->whereIn('id', $tagsIds)->get()->toArray();
+        $tags = array_column($tags, null, 'id');
+        $userInfo = UserInfo::query()->whereIn('user_id', $userIds)->get()->toArray();
+        $userInfo = array_column($userInfo, null, 'user_id');
+        $relations = UserRelations::followRelation(Auth::id(), $userIds);
+        foreach ($coaches as &$coach) {
+            $coach['tags'] = [];
+            foreach ($coachTags as $coachTag) {
+                if ($coachTag['coach_id'] == $coach['id']) {
+                    if (isset($tags[$coachTag['tag_id']])) {
+                        $coach['tags'][] = $tags[$coachTag['tag_id']];
+                    }
+                }
+            }
+            $coach['user'] = $userInfo[$coach['user_id']];
+            $coach['followed'] = $relations[$coach['user_id']];
+            unset($coach);
+        }
+        return [
+            'coaches' => $coaches
+        ];
+    }
 }

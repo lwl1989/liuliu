@@ -62,6 +62,7 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
         Route::post('follow', 'Users\UsersController@follow');
         Route::post('unfollow', 'Users\UsersController@unFollow');
         Route::get('scenes/{uid}', 'Users\UsersController@scenes');
+        Route::get('coaches/{uid}', 'Users\UsersController@coaches');
     });
 
     Route::group(['prefix' => 'coach'], function (){
