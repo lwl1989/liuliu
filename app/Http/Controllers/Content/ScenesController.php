@@ -322,7 +322,7 @@ class ScenesController extends Controller
         try {
             $params = ArrayParse::checkParamsArray(['value'], $request->input());
             $params['user_id'] = $uid;
-            $params['$sceneId'] = $sceneId;
+            $params['sceneId'] = $sceneId;
             $typ = Common::USER_OP_REPLY_SCENE;
             $cid = SceneReply::query()->insertGetId($params);
 
