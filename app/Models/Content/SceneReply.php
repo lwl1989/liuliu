@@ -29,7 +29,7 @@ class SceneReply extends Model
         }
 
         $ids = array_column($list, 'id');
-        $replyCounts = self::query()->whereIn('scene_id', $ids)->where('status',Common::STATUS_NORMAL)
+        $replyCounts = self::query()->whereIn('scene_id', $ids)->where('status', Common::STATUS_NORMAL)
             ->selectRaw('count(*) as count,scene_id')->groupBy('scene_id')->get()->toArray();
         $replyCounts = array_column($replyCounts, 'count', 'scene_id');
         foreach ($list as $index => $item) {
@@ -38,21 +38,22 @@ class SceneReply extends Model
                 $list[$index]['reply_counts'] = $replyCounts[$item['id']];
             }
         }
+
         if ($replyUserGet > 0) {
-            $replies = self::query()->whereIn('scene_id', $ids)->where('status',Common::STATUS_NORMAL)
-                ->select(['user_id','scene_id'])->get()->toArray();
+            $replies = self::query()->whereIn('scene_id', $ids)->where('status', Common::STATUS_NORMAL)
+                ->select(['user_id', 'scene_id'])->get()->toArray();
             $replies = array_column($replies, 'user_id', 'scene_id');
-            $replyUserIds = array_column($replies, 'user_id');
+            $replyUserIds = array_values($replies);
             $replyUserIds = array_unique($replyUserIds);
-            if(!empty($replyUserIds)) {
+            if (!empty($replyUserIds)) {
                 $users = UserInfo::query()->whereIn('user_id', $replyUserIds)->get()->toArray();
                 $users = array_column($users, null, 'user_id');
 
                 foreach ($list as $index => $item) {
                     $list[$index]['reply_users'] = [];
-                    foreach ($replies as $sceneId=>$userId) {
-                        if($item['id'] == $sceneId) {
-                            if(isset($users[$userId])) {
+                    foreach ($replies as $sceneId => $userId) {
+                        if ($item['id'] == $sceneId) {
+                            if (isset($users[$userId])) {
                                 $list[$index]['reply_users'][] = $users[$userId];
                             }
                         }

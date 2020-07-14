@@ -317,10 +317,12 @@ class ScenesController extends Controller
     public function reply(Request $request): array
     {
         $uid = Auth::id();
+        $sceneId = $request->route('scene_id');
         DB::beginTransaction();
         try {
             $params = ArrayParse::checkParamsArray(['value'], $request->input());
             $params['user_id'] = $uid;
+            $params['$sceneId'] = $sceneId;
             $typ = Common::USER_OP_REPLY_SCENE;
             $cid = SceneReply::query()->insertGetId($params);
 
