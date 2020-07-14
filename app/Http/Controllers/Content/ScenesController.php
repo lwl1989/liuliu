@@ -17,6 +17,7 @@ use App\Models\Content\Scene;
 use App\Models\Content\SceneReply;
 use App\Models\RegisterUsers\UserCounts;
 use App\Models\RegisterUsers\UserInfo;
+use App\Models\RegisterUsers\UserNotice;
 use App\Models\RegisterUsers\UserOpLog;
 use App\Models\RegisterUsers\UserZan;
 use Illuminate\Http\Request;
@@ -318,6 +319,10 @@ class ScenesController extends Controller
     {
         $uid = Auth::id();
         $sceneId = $request->route('scene_id');
+        $scene = Scene::query()->where('id', $sceneId)->first();
+        if(!$scene) {
+            return ['code' => ErrorConstant::SYSTEM_ERR, 'response' => '数据不存在'];
+        }
         DB::beginTransaction();
         try {
             $params = ArrayParse::checkParamsArray(['value'], $request->input());
@@ -331,6 +336,14 @@ class ScenesController extends Controller
                 'user_id' => $uid,
                 'op_typ_id' => $cid,
                 'typ' => $typ
+            ]);
+            UserNotice::query()->insert([
+                'user_id'   =>  $scene->user_id,
+                'obj_id'    =>  $sceneId,
+                'op_user_id'=>  $uid,
+                'op_type'   =>  Common::USER_OP_REPLY_SCENE,
+                'typ'       =>  Common::CONTENT_SCENE,
+                'status'    =>  0 //未读
             ]);
             DB::commit();
             return ['id' => $cid];

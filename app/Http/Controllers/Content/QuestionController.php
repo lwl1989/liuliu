@@ -19,6 +19,7 @@ use App\Models\Question\QuestionReply;
 use App\Models\Question\Questions;
 use App\Models\RegisterUsers\UserCounts;
 use App\Models\RegisterUsers\UserInfo;
+use App\Models\RegisterUsers\UserNotice;
 use App\Models\RegisterUsers\UserOpLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -249,6 +250,14 @@ class QuestionController extends Controller
                 'user_id' => $uid,
                 'op_typ_id' => $aid,
                 'typ' => $typ
+            ]);
+            UserNotice::query()->insert([
+                'user_id'   =>  $question->user_id,
+                'obj_id'    =>  $params['question_id'],
+                'op_user_id'=>  $uid,
+                'op_type'   =>  Common::USER_OP_ANSWER,
+                'typ'       =>  Common::CONTENT_QUESTION,
+                'status'    =>  0 //未读
             ]);
             DB::commit();
             return ['id' => $aid];

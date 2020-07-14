@@ -12,6 +12,7 @@ use App\Models\Content\ContentComment;
 use App\Models\Content\ContentCounts;
 use App\Models\RegisterUsers\UserCounts;
 use App\Models\RegisterUsers\UserInfo;
+use App\Models\RegisterUsers\UserNotice;
 use App\Models\RegisterUsers\UserOpLog;
 use App\Models\RegisterUsers\Users;
 use App\Models\RegisterUsers\UserZan;
@@ -45,7 +46,11 @@ class CommentController extends Controller
         if (!$cid) {
             return ['code' => ErrorConstant::PARAMS_ERROR, 'response' => 'id错误'];
         }
-        $content = $request->post('content', '');
+        $contentValue = $request->post('content', '');
+        $content = Content::query()->where('id', $cid)->first();
+        if (!$content) {
+            return ['code' => ErrorConstant::PARAMS_ERROR, 'response' => 'id错误'];
+        }
         $uid = Auth::id();
 
         DB::beginTransaction();
@@ -55,7 +60,7 @@ class CommentController extends Controller
                 'user_id' => $uid,
                 'content_id' => $cid,
                 'parent_id' => $pid,
-                'content' => $content,
+                'content' => $contentValue,
             ]);
 
             $typ = Common::USER_OP_COMMENT;
@@ -66,6 +71,15 @@ class CommentController extends Controller
                 'user_id' => $uid,
                 'op_typ_id' => $cid,
                 'typ' => $typ
+            ]);
+
+            UserNotice::query()->insert([
+                'user_id'   =>  $content->user_id,
+                'obj_id'    =>  $cid,
+                'op_user_id'=>  $uid,
+                'op_type'   =>  Common::USER_OP_BE_COMMENT,
+                'typ'       =>  Common::CONTENT_CONTENT,
+                'status'    =>  0 //未读
             ]);
             return ['id' => $cid];
         } catch (\Exception $e) {

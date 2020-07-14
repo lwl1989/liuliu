@@ -12,8 +12,10 @@ namespace App\Http\Controllers\Content;
 use App\Exceptions\ErrorConstant;
 use App\Http\Controllers\Controller;
 use App\Library\Constant\Common;
+use App\Models\Content\Content;
 use App\Models\Content\ContentCounts;
 use App\Models\RegisterUsers\UserCounts;
+use App\Models\RegisterUsers\UserNotice;
 use App\Models\RegisterUsers\UserOpLog;
 use App\Models\RegisterUsers\UserZan;
 use Illuminate\Http\Request;
@@ -46,6 +48,10 @@ class ZanController extends Controller
         if (!$cid) {
             return ['code' => ErrorConstant::PARAMS_ERROR, 'response' => 'id错误'];
         }
+        $content = Content::query()->where('id', $cid)->first();
+        if (!$content) {
+            return ['code' => ErrorConstant::PARAMS_ERROR, 'response' => 'id错误'];
+        }
         DB::beginTransaction();
         $uid = Auth::id();
         $exists = UserZan::query()->where('user_id', $uid)->where('typ', $typ)->where('obj_id', $cid)->first();
@@ -67,6 +73,14 @@ class ZanController extends Controller
                 'user_id' => $uid,
                 'op_typ_id' => $cid,
                 'typ' => $opTyp
+            ]);
+            UserNotice::query()->insert([
+                'user_id'   =>  $content->user_id,
+                'obj_id'    =>  $cid,
+                'op_user_id'=>  $uid,
+                'op_type'   =>  Common::USER_OP_BE_ZAN,
+                'typ'       =>  Common::CONTENT_CONTENT,
+                'status'    =>  0 //未读
             ]);
 
             return ['id' => $cid];

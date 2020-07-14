@@ -25,6 +25,11 @@ class Common
     const CONTENT_TYPE_BAG = 1;
     const CONTENT_TYPE_MATERIAL = 2;
     const CONTENT_TYPE_NOTES = 3;
+
+
+    const CONTENT_CONTENT = 1;
+    const CONTENT_SCENE = 4;
+    const CONTENT_QUESTION = 5;
     //共用
     const DELETED = 1;
     const NO_DELETE = 0;
