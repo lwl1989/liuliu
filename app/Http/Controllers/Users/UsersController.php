@@ -759,9 +759,13 @@ class UsersController extends Controller
     public function notices(Request $request): array
     {
         $uid = $request->route('uid');
+        $page = $request->get('page', 1);
+        $limit = $request->get('limit', 15);
         $notices = UserNotice::query()->where('user_id', $uid)
             ->where('status', Common::STATUS_NORMAL)
             ->orderBy('id', 'desc')
+            ->limit($limit)
+            ->offset(($page - 1) * $limit)
             ->get()->toArray();
         if (empty($notices)) {
             return [
