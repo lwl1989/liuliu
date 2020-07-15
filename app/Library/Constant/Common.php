@@ -18,6 +18,9 @@ class Common
     const USER_OP_RELEASE_SCENE = 12;
     const USER_OP_REPLY_SCENE = 13;
 
+    const USER_OP_FAVORITES = 12;
+    const USER_OP_BE_FAVORITES = 13;
+
     const USER_OP_QUESTION = 10;
     const USER_OP_BE_QUESTION = 11;
 

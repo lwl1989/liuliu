@@ -11,6 +11,7 @@ use App\Models\Common\Tags;
 use App\Models\Content\Content;
 use App\Models\Content\ContentComment;
 use App\Models\Content\ContentCounts;
+use App\Models\Content\Resources;
 use App\Models\Content\Scene;
 use App\Models\Content\SceneReply;
 use App\Models\Content\Topics;
@@ -21,6 +22,7 @@ use App\Models\RegisterUsers\UserBind;
 use App\Models\RegisterUsers\UserCoach;
 use App\Models\RegisterUsers\UserCoachTags;
 use App\Models\RegisterUsers\UserCounts;
+use App\Models\RegisterUsers\UserFavorites;
 use App\Models\RegisterUsers\UserInfo;
 use App\Models\RegisterUsers\UserOpLog;
 use App\Models\RegisterUsers\UserRelations;
@@ -672,6 +674,57 @@ class UsersController extends Controller
         }
         return [
             'coaches' => $coaches
+        ];
+    }
+
+    /**
+     * @api               {get} /api/user/favorites 我的收藏
+     *
+     * @apiGroup          用户中心
+     * @apiName           我的收藏
+     *
+     * @apiVersion        1.0.0
+     *
+     * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     *   {
+     *      "contents": [
+     *          {
+     *              'content':{
+     *              "id": "1",
+     *              "name": "真人秀",
+     *              "sort": "1",
+     *              "status": "1",
+     *              "create_time": "1588069984",
+     *              "update_time": "1588069984"
+     *              },
+     *              'user':{//userinfo}
+     *          }
+     *          ,//...
+     *      ],
+     *   }
+     */
+    /**
+     * @param Request $request
+     * @return array
+     */
+    public function favorites(Request $request): array
+    {
+        $uid = $request->route('uid');
+        $favorites = UserFavorites::query()->where('user_id',   $uid)->get()->toArray();
+        if (empty($favorites)) {
+            return [
+                'contents' => []
+            ];
+        }
+
+        $result = Content::query()->whereIn('id', array_column($favorites, 'obj_id'))->where('status', Common::STATUS_NORMAL)->get()->toArray();
+        $result = UserInfo::getUserInfoWithList($result);
+        $result = ContentCounts::getContentsCounts($result);
+        $result = Resources::getResources($result);
+
+        return [
+            'contents' => $result
         ];
     }
 }

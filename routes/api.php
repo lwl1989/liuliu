@@ -41,6 +41,9 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
 
         Route::post('zan', 'Content\ZanController@zan');
         Route::post('unzan', 'Content\ZanController@unZan');
+
+        Route::post('favorites', 'Content\FavoritesController@favorites');
+        Route::post('unfavorites', 'Content\FavoritesController@unfavorites');
     });
 
     Route::group(['prefix' => 'question'],function (){
@@ -63,6 +66,8 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
         Route::post('unfollow', 'Users\UsersController@unFollow');
         Route::get('scenes/{uid}', 'Users\UsersController@scenes');
         Route::get('coaches/{uid}', 'Users\UsersController@coaches');
+
+        Route::get('favorites/{uid}', 'Users\UsersController@favorites');
     });
 
     Route::group(['prefix' => 'coach'], function (){
