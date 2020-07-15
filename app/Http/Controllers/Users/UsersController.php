@@ -884,7 +884,7 @@ class UsersController extends Controller
 
         $results = UserInfo::getUserInfoWithList($results);
         $results = uasort($results, function ($a, $b) {
-            return ($a > $b) ? -1 : 1;
+            return ($a['time'] > $b['time']) ? -1 : 1;
         });
         return [
             'contents' => $results
