@@ -68,6 +68,7 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
         Route::get('coaches/{uid}', 'Users\UsersController@coaches');
 
         Route::get('favorites/{uid}', 'Users\UsersController@favorites');
+        Route::get('notices/{uid}', 'Users\UsersController@notices');
     });
 
     Route::group(['prefix' => 'coach'], function (){

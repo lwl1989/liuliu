@@ -31,8 +31,9 @@ class Common
 
 
     const CONTENT_CONTENT = 1;
-    const CONTENT_SCENE = 4;
-    const CONTENT_QUESTION = 5;
+    const CONTENT_SCENE = 2;
+    const CONTENT_QUESTION = 3;
+    const CONTENT_USER = 4;
     //共用
     const DELETED = 1;
     const NO_DELETE = 0;

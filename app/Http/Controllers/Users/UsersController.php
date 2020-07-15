@@ -24,6 +24,7 @@ use App\Models\RegisterUsers\UserCoachTags;
 use App\Models\RegisterUsers\UserCounts;
 use App\Models\RegisterUsers\UserFavorites;
 use App\Models\RegisterUsers\UserInfo;
+use App\Models\RegisterUsers\UserNotice;
 use App\Models\RegisterUsers\UserOpLog;
 use App\Models\RegisterUsers\UserRelations;
 use App\Models\RegisterUsers\Users;
@@ -711,7 +712,7 @@ class UsersController extends Controller
     public function favorites(Request $request): array
     {
         $uid = $request->route('uid');
-        $favorites = UserFavorites::query()->where('user_id',   $uid)->get()->toArray();
+        $favorites = UserFavorites::query()->where('user_id', $uid)->get()->toArray();
         if (empty($favorites)) {
             return [
                 'contents' => []
@@ -725,6 +726,164 @@ class UsersController extends Controller
 
         return [
             'contents' => $result
+        ];
+    }
+
+    /**
+     * @api               {get} /api/user/notices 我的通知
+     *
+     * @apiParam {String} page
+     * @apiParam {String} limit
+     * @apiGroup          用户中心
+     * @apiName           我的通知
+     *
+     * @apiVersion        1.0.0
+     *
+     * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     *   {
+     *      "contents": [
+     *          {
+     *                   'op':'点赞了你的文章',
+     *                  'name':"文章标题",
+     *                  "user":{//userinfo 操作人}
+     *          }
+     *          ,//...
+     *      ],
+     *   }
+     */
+    /**
+     * @param Request $request
+     * @return array
+     */
+    public function notices(Request $request): array
+    {
+        $uid = $request->route('uid');
+        $notices = UserNotice::query()->where('user_id', $uid)
+            ->where('status', Common::STATUS_NORMAL)
+            ->orderBy('id', 'desc')
+            ->get()->toArray();
+        if (empty($notices)) {
+            return [
+                'contents' => []
+            ];
+        }
+
+        $contentIds = [];
+        $questionIds = [];
+        $sceneIds = [];
+        $userIds = [];
+        foreach ($notices as $notice) {
+            switch ($notice['typ']) {
+                case Common::CONTENT_CONTENT:
+                    $contentIds[] = $notice['obj_id'];
+                    break;
+                case Common::CONTENT_QUESTION:
+                    $questionIds[] = $notice['obj_id'];
+                    break;
+                case Common::CONTENT_SCENE:
+                    $sceneIds[] = $notice['obj_id'];
+                    break;
+                case Common::CONTENT_USER:
+                    $userIds[] = $notice['obj_id'];
+                    break;
+            }
+        }
+
+
+        $results = [];
+        if (!empty($contentIds)) {
+            $contents = Content::query()->whereIn('id', $contentIds)->get()->toArray();
+            foreach ($contents as &$content) {
+                foreach ($notices as $notice) {
+                    if ($notice['obj_id'] == $contents['id'] and $notice['typ'] == Common::CONTENT_CONTENT) {
+                        switch ($notice['op_type']) {
+                            case Common::USER_OP_BE_ZAN:
+                            case Common::USER_OP_ZAN:
+                                $request[] = [
+                                    'user_id' => $notice['op_user_id'],
+                                    'op' => '点赞了你的文章',
+                                    'name' => $content['name']
+                                ];
+                                break;
+                            case Common::USER_OP_FAVORITES:
+                            case Common::USER_OP_BE_FAVORITES:
+                                $request[] = [
+                                    'user_id' => $notice['op_user_id'],
+                                    'op' => '收藏了你的文章',
+                                    'name' => $content['name'],
+                                    'time' => $notice['create_time']
+                                ];
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!empty($sceneIds)) {
+            $contents = Scene::query()->whereIn('id', $contentIds)->get()->toArray();
+            foreach ($contents as &$content) {
+                foreach ($notices as $notice) {
+                    if ($notice['obj_id'] == $contents['id'] and $notice['typ'] == Common::CONTENT_SCENE) {
+                        switch ($notice['op_type']) {
+                            case Common::USER_OP_REPLY_SCENE:
+                                $request[] = [
+                                    'user_id' => $notice['op_user_id'],
+                                    'op' => '参与了你的话题',
+                                    'name' => $content['name'],
+                                    'time' => $notice['create_time']
+                                ];
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!empty($questionIds)) {
+            $contents = Questions::query()->whereIn('id', $contentIds)->get()->toArray();
+            foreach ($contents as &$content) {
+                foreach ($notices as $notice) {
+                    if ($notice['obj_id'] == $contents['id'] and $notice['typ'] == Common::CONTENT_QUESTION) {
+                        switch ($notice['op_type']) {
+                            case Common::USER_OP_BE_QUESTION:
+                            case Common::USER_OP_ANSWER:
+                            case Common::USER_OP_QUESTION:
+                                $request[] = [
+                                    'user_id' => $notice['op_user_id'],
+                                    'op' => '回答了你的提问',
+                                    'name' => $content['title'],
+                                    'time' => $notice['create_time']
+                                ];
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!empty($userIds)) {
+            $userIds = array_unique($userIds);
+            foreach ($userIds as $userId) {
+                foreach ($notices as $notice) {
+                    if ($userId == $notice['obj_id'] and $notice['typ'] == Common::CONTENT_USER) {
+                        $request[] = [
+                            'user_id' => $notice['op_user_id'],
+                            'op' => '关注了你',
+                            'name' => '',
+                            'time' => $notice['create_time']
+                        ];
+                    }
+                }
+            }
+        }
+
+        $results = UserInfo::getUserInfoWithList($results);
+        $results = uasort($results, function ($a, $b) {
+            return ($a > $b) ? -1 : 1;
+        });
+        return [
+            'contents' => $results
         ];
     }
 }
