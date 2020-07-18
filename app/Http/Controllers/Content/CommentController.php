@@ -211,7 +211,7 @@ class CommentController extends Controller
                     }
                 }
             }
-
+            $comments = $results;
         }
         return [
             'comments' => $comments
