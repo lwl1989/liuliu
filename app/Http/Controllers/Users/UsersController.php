@@ -202,7 +202,7 @@ class UsersController extends Controller
 
         $sort = $request->query('sort');
         if($sort != '' && $sort == 'hot') {
-            $contents = uasort($contents, function ($a, $b) {
+            uasort($contents, function ($a, $b) {
                 return (($a['counts']['3']+$a['counts']['6']) > ($b['counts']['3']+$b['counts']['6'])) ? -1 : 1;
             });
         }
@@ -891,7 +891,7 @@ class UsersController extends Controller
         }
 
         $results = UserInfo::getUserInfoWithList($results);
-        $results = uasort($results, function ($a, $b) {
+        uasort($results, function ($a, $b) {
             return ($a['time'] > $b['time']) ? -1 : 1;
         });
         return [
