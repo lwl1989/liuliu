@@ -133,10 +133,12 @@ class ContentController extends Controller
             ->where('user_id', $uid)
             ->where('status', Common::STATUS_NORMAL)
             ->first();
-        $avatar = UserInfo::query() ->where('user_id', $uid)->select(['avatar'])->first();
+        $avatar = UserInfo::query() ->where('user_id', $uid)->select(['avatar','nickname'])->first();
         $user['avatar'] = '';
+        $user['nickname'] = '';
         if($avatar) {
             $user['avatar'] = $avatar->avatar;
+            $user['nickname'] = $avatar->nickname;
         }
         if ($relation) {
             $user['followed'] = '1';
@@ -408,13 +410,12 @@ class ContentController extends Controller
     {
         $type = $request->get('type', 1);
 
-        $result = Content::query()->where('typ', $type)->inRandomOrder()->take(10)->get()->toArray();
+        $result = Content::query()->where('template_id', 2)->where('typ', $type)->inRandomOrder()->take(10)->get()->toArray();
         $result = UserInfo::getUserInfoWithList($result);
         $result = ContentCounts::getContentsCounts($result);
 
         foreach ($result as &$item) {
             $item['resources'] = Resources::query()
-                ->where('template_id', 2)
                 ->where('content_id', $item['id'])
                 ->where('status', Common::STATUS_NORMAL)->get()->toArray();
             unset($item);
