@@ -203,7 +203,7 @@ class UsersController extends Controller
         $sort = $request->query('sort');
         if($sort != '' && $sort == 'hot') {
             $contents = uasort($contents, function ($a, $b) {
-                return (($a['count']['3']+$a['count']['6']) > ($b['count']['3']+['count']['6'])) ? -1 : 1;
+                return (($a['counts']['3']+$a['counts']['6']) > ($b['counts']['3']+['counts']['6'])) ? -1 : 1;
             });
         }
         return [
