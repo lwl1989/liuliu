@@ -150,7 +150,7 @@ class CommentController extends Controller
 
             $uid = Auth::id();
             if ($uid > 0) {
-                $exists = UserZan::query()->where('typ', 2)->where('obj_id', $commentIds)->where('user_id', $uid)->get(['id', 'user_id', 'obj_id'])->toArray();
+                $exists = UserZan::query()->where('typ', 2)->whereIn('obj_id', $commentIds)->where('user_id', $uid)->get(['id', 'user_id', 'obj_id'])->toArray();
                 foreach ($comments as &$comment) {
                     $comment['zan'] = 0;
 
