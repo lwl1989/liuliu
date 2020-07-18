@@ -145,6 +145,7 @@ class UsersController extends Controller
      * @api               {get} /api/user/contents/{uid} 我的feed流
      * @apiGroup          用户中心
      * @apiName           我的feed流
+     * @apiParam {String} sort time|hot
      * @apiVersion        1.0.0
      *
      * @apiSuccessExample Success-Response
@@ -188,6 +189,7 @@ class UsersController extends Controller
         }
 
         $userIds = array_column($relations, 're_user_id');
+
         $contents = Content::query()
             ->whereIn('user_id', $userIds)
             ->where('status', Common::STATUS_NORMAL)
@@ -198,6 +200,12 @@ class UsersController extends Controller
         $contents = UserInfo::getUserInfoWithList($contents);
         $contents = ContentCounts::getContentsCounts($contents);
 
+        $sort = $request->query('sort');
+        if($sort != '' && $sort == 'hot') {
+            $contents = uasort($results, function ($a, $b) {
+                return (($a['count']['3']+$a['count']['6']) > ($b['count']['3']+['count']['6'])) ? -1 : 1;
+            });
+        }
         return [
             'contents' => $contents
         ];
