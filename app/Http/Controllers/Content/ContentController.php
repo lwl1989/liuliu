@@ -58,7 +58,9 @@ class ContentController extends Controller
      *          'is_coach':1,
      *          'job':'xxx',
      *          'real_name':'xxx',
-     *          'followed':'1'
+     *          'followed':'1',
+     *                    'nickname':'',
+     *                    'avatar':''
      *         },
      *      "tags":[{"id":"1","name":"ojbk"}],
      *      "topics":[{"id":"1","name":"ojbk"}],
@@ -70,6 +72,7 @@ class ContentController extends Controller
      */
     /**
      * @param Request $request
+     *
      * @return array
      */
     public function detail(Request $request): array
@@ -133,10 +136,10 @@ class ContentController extends Controller
             ->where('user_id', $uid)
             ->where('status', Common::STATUS_NORMAL)
             ->first();
-        $avatar = UserInfo::query() ->where('user_id', $uid)->select(['avatar','nickname'])->first();
+        $avatar = UserInfo::query()->where('user_id', $uid)->select(['avatar', 'nickname'])->first();
         $user['avatar'] = '';
         $user['nickname'] = '';
-        if($avatar) {
+        if ($avatar) {
             $user['avatar'] = $avatar->avatar;
             $user['nickname'] = $avatar->nickname;
         }
@@ -404,6 +407,7 @@ class ContentController extends Controller
      */
     /**
      * @param Request $request
+     *
      * @return array
      */
     public function recommend(Request $request): array
