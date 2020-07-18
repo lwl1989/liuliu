@@ -105,7 +105,8 @@ class CommentController extends Controller
      *              "content": "真人秀",
      *              "user":{//用户信息},
      *              "zan":"1",
-     *              "zanCount":"1"
+     *              "zanCount":"1",
+     *              "replies":[//comment对象 和本级内容一致]
      *       },
 
      *   }
@@ -121,15 +122,17 @@ class CommentController extends Controller
             return ['code' => ErrorConstant::PARAMS_ERROR, 'response' => 'id错误'];
         }
 
-        $comments = ContentComment::query()->where('content_id', $id)->where('parent_id', 0)->where('status', Common::STATUS_NORMAL)->get()->toArray();
-
+        $comments = ContentComment::query()->where('content_id', $id)->where('status', Common::STATUS_NORMAL)->get()->toArray();
+        //->where('parent_id', 0)
         if (!empty($comments)) {
-            $comments = UserInfo::getUserInfoWithList($comments);
+            $comments = [];
             $commentIds = array_column($comments, 'id');
             $zanCount = UserZan::query()->where('typ', 2)
                 ->where('obj_id', $commentIds)
                 ->groupBy('obj_id')
                 ->selectRaw('count(*) as count, obj_id')->get()->toArray();
+            $comments = UserInfo::getUserInfoWithList($comments);
+
             foreach ($comments as &$comment) {
                 $comment['zanCount'] = 0;
                 foreach ($zanCount as $item) {
@@ -160,6 +163,55 @@ class CommentController extends Controller
                     unset($comment);
                 }
             }
+
+            $results = [];
+            $findIds = [];
+            foreach ($comments as $comment) {
+                $comment['replies'] = [];
+                if($comment['parent_id'] == 0) {
+                    $results[] = $comment;
+                    $findIds[] = $comment['id'];
+                }
+            }
+
+            if(count($findIds) < count($comments)) {
+                foreach ($comments as $comment) {
+                    if ($comment['parent_id'] != 0) {
+                        foreach ($results as &$result) {
+                            if ($comment['parent_id'] == $result['id']) {
+                                $result['replies'][] = $comment;
+                                $findIds[] = $comment['id'];
+                                unset($result);
+                                break;
+                            }
+                            unset($result);
+                        }
+                    }
+                }
+            }
+
+
+            if(count($findIds) < count($comments)) {
+                foreach ($comments as $comment) {
+                    if ($comment['parent_id'] != 0) {
+                        foreach ($results as &$result) {
+                            if(isset($result['replies']) and count($result['replies']) > 0) {
+                                foreach ($result['replies'] as &$reply) {
+                                    if ($comment['parent_id'] == $reply['id']) {
+                                        $result['replies'][] = $comment;
+                                        $findIds[] = $comment['id'];
+                                        unset($result);
+                                        break;
+                                    }
+                                    unset($reply);
+                                }
+                            }
+                            unset($result);
+                        }
+                    }
+                }
+            }
+
         }
         return [
             'comments' => $comments
