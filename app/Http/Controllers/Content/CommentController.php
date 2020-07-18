@@ -125,7 +125,6 @@ class CommentController extends Controller
         $comments = ContentComment::query()->where('content_id', $id)->where('status', Common::STATUS_NORMAL)->get()->toArray();
         //->where('parent_id', 0)
         if (!empty($comments)) {
-            $comments = [];
             $commentIds = array_column($comments, 'id');
             $zanCount = UserZan::query()->where('typ', 2)
                 ->whereIn('obj_id', $commentIds)
