@@ -133,6 +133,11 @@ class ContentController extends Controller
             ->where('user_id', $uid)
             ->where('status', Common::STATUS_NORMAL)
             ->first();
+        $avatar = UserInfo::query() ->where('user_id', $uid)->select(['avatar'])->first();
+        $user['avatar'] = '';
+        if($avatar) {
+            $user['avatar'] = $avatar->avatar;
+        }
         if ($relation) {
             $user['followed'] = '1';
         }

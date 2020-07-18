@@ -137,6 +137,10 @@ class CommentController extends Controller
                         $comment['zanCount'] = $item['count'];
                     }
                 }
+                if(is_numeric($comment['create_time'])) {
+                    $comment['create_time'] = date('Y-m-d H:i:s', $comment['create_time']);
+                    $comment['update_time'] = date('Y-m-d H:i:s', $comment['update_time']);
+                }
                 unset($comment);
             }
 
