@@ -34,8 +34,8 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
     Route::group(['prefix' => 'content'],function (){
         Route::post('comment', 'Content\CommentController@comment');
         Route::post('release', 'Content\ContentController@release');
-        Route::get('/detail','Content\ContentController@detail');
-        Route::get('/comments','Content\CommentController@all');
+        Route::get('detail','Content\ContentController@detail');
+        Route::get('comments','Content\CommentController@all');
 
         Route::get('/', 'Content\ContentController@myList');
 
@@ -107,5 +107,4 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
     Route::get('scenes', 'Content\ScenesController@page');
     Route::get('questions', 'Content\QuestionController@timeLine');
     Route::get('tags', 'Common\TagsController@getAll');
-
 });

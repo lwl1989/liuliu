@@ -21,6 +21,7 @@ use App\Models\Content\ContentTags;
 use App\Models\Content\Resources;
 use App\Models\RegisterUsers\UserCoach;
 use App\Models\RegisterUsers\UserCounts;
+use App\Models\RegisterUsers\UserFavorites;
 use App\Models\RegisterUsers\UserInfo;
 use App\Models\RegisterUsers\UserOpLog;
 use App\Models\RegisterUsers\UserRelations;
@@ -160,7 +161,16 @@ class ContentController extends Controller
             if ($exists) {
                 $zan = 1;
             }
-            $zanCount = UserZan::query()->where('typ', 1)->where('obj_id', $id)->count();
+            $zanCount = UserZan::query()->where('typ', UserZan::UserZanContent)->where('obj_id', $id)->count();
+        }
+        $favorites = 0;
+        $favoritesCount = 0;
+        if ($uid > 0) {
+            $exists = UserFavorites::query()->where('user_id', $uid)->where('typ', UserFavorites::UserFavoritesContent)->where('obj_id', $id)->first(['id']);
+            if ($exists) {
+                $favorites = 1;
+            }
+            $favoritesCount = UserFavorites::query()->where('typ', UserFavorites::UserFavoritesContent)->where('obj_id', $id)->count();
         }
         return [
             'uid' => $uid,
@@ -172,6 +182,9 @@ class ContentController extends Controller
             'zan' => $zan,
             'zanCount' => $zanCount,
             'commentCount' => $commentCount,
+            'favorites' => $favorites,
+            'is_favorite' => $favorites,
+            'favoritesCount' => $favoritesCount
         ];
     }
 
