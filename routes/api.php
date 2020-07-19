@@ -61,7 +61,7 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
         Route::get('questions/{uid}', 'Users\UsersController@questions');
         Route::get('topics/{uid}', 'Users\UsersController@topics');
         Route::get('answer/{uid}', 'Users\UsersController@myAnswer');
-        Route::post('center', 'Users\UsersController@center');
+        Route::get('center', 'Users\UsersController@center');
         Route::post('follow', 'Users\UsersController@follow');
         Route::post('unfollow', 'Users\UsersController@unFollow');
         Route::get('scenes/{uid}', 'Users\UsersController@scenes');
