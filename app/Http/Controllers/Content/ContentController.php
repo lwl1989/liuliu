@@ -68,7 +68,9 @@ class ContentController extends Controller
      *      "resources":[{"id":"1","value":"httpxxxxxxx"}]
      *      "zan":"1",
      *      "zanCount":"100",
-     *      "commentCount":"101"
+     *      "commentCount":"101",
+     *                    "is_favorite":"1",
+     *                    "favoriteCount":"100"
      *   }
      */
     /**
@@ -184,7 +186,7 @@ class ContentController extends Controller
             'commentCount' => $commentCount,
             'favorites' => $favorites,
             'is_favorite' => $favorites,
-            'favoritesCount' => $favoritesCount
+            'favoriteCount' => $favoritesCount
         ];
     }
 
