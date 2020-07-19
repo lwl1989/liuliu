@@ -77,7 +77,7 @@ class UsersController extends Controller
         $fansCount = UserRelations::query()->where('re_user_id', $uid)->where('status', Common::STATUS_NORMAL)->count();
 
 
-        $followCount = UserCounts::query()->where('user_id', $uid)->where('status', Common::STATUS_DISABLE)->count();
+        $followCount = UserRelations::query()->where('user_id', $uid)->where('status', Common::STATUS_DISABLE)->count();
 
         $isCoach = 0;
         $coach = UserCoach::query()->where('user_id', $uid)->where('status', Common::STATUS_NORMAL)->first();
