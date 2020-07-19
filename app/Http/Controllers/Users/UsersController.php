@@ -74,17 +74,11 @@ class UsersController extends Controller
         $info = UserInfo::query()->where('user_id', $uid)->first();
         $tags = UserSubTags::query()->where('user_id', $uid)->get()->toArray();
 
-        $fansCount = 0;
-        $fans = UserCounts::query()->where('user_id', $uid)->where('typ', Common::USER_OP_BE_FOLLOW)->first(['counts']);
-        if ($fans) {
-            $fansCount = ($fans->toArray())['counts'];
-        }
+        $fansCount = UserRelations::query()->where('re_user_id', $uid)->where('status', Common::STATUS_NORMAL)->count();
 
-        $followCount = 0;
-        $follows = UserCounts::query()->where('user_id', $uid)->where('typ', Common::USER_OP_FOLLOW)->first(['counts']);
-        if ($follows) {
-            $followCount = ($follows->toArray())['counts'];
-        }
+
+        $followCount = UserCounts::query()->where('user_id', $uid)->where('status', Common::STATUS_DISABLE)->count();
+
         $isCoach = 0;
         $coach = UserCoach::query()->where('user_id', $uid)->where('status', Common::STATUS_NORMAL)->first();
         if ($coach) {
