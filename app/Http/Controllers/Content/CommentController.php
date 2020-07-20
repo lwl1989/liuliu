@@ -145,7 +145,7 @@ class CommentController extends Controller
                 }
                 unset($comment);
             }
-
+            var_dump($comments);exit();
 
             $uid = Auth::id();
             if ($uid > 0) {
