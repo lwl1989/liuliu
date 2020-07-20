@@ -167,7 +167,6 @@ class CommentController extends Controller
                     $findIds[] = $comment['id'];
                 }
             }
-            var_dump($results);exit();
             if(count($findIds) < count($comments)) {
                 foreach ($comments as $comment) {
                     if ($comment['parent_id'] != 0) {
@@ -207,6 +206,7 @@ class CommentController extends Controller
             }
             $comments = $results;
         }
+        var_dump($comments);exit();
         return [
             'comments' => $comments
         ];
