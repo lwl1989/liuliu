@@ -139,13 +139,8 @@ class CommentController extends Controller
                         $comment['zanCount'] = $item['count'];
                     }
                 }
-                if(is_numeric($comment['create_time'])) {
-                    $comment['create_time'] = date('Y-m-d H:i:s', $comment['create_time']);
-                    $comment['update_time'] = date('Y-m-d H:i:s', $comment['update_time']);
-                }
                 unset($comment);
             }
-            var_dump($comments);exit();
 
             $uid = Auth::id();
             if ($uid > 0) {
@@ -172,7 +167,7 @@ class CommentController extends Controller
                     $findIds[] = $comment['id'];
                 }
             }
-
+            var_dump($results);exit();
             if(count($findIds) < count($comments)) {
                 foreach ($comments as $comment) {
                     if ($comment['parent_id'] != 0) {
