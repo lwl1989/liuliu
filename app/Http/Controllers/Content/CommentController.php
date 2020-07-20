@@ -206,7 +206,6 @@ class CommentController extends Controller
             }
             $comments = $results;
         }
-        var_dump($comments);exit();
         return [
             'comments' => $comments
         ];
