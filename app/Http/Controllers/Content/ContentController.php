@@ -284,6 +284,7 @@ class ContentController extends Controller
      * @apiParam {String} tag_id
      * @apiParam {String} page
      * @apiParam {String} limit
+     * @apiParam {String} typ
      * @apiGroup          内容获取
      * @apiName           获取不同标签下文章内容
      *
@@ -330,7 +331,7 @@ class ContentController extends Controller
                 $contentBind = ContentTags::query()->where('relation_id', $tagId)->where('typ', 1)->orderBy('id', 'desc')->limit(200)->get()->toArray();
                 if (!empty($contentBind)) {
                     $contentIds = array_column($contentBind, 'content_id');
-                    $result = ContentService::getContentListView($contentIds, ($page - 1) * $limit, $limit);
+                    $result = ContentService::getContentListView($contentIds, ($page - 1) * $limit, $limit, $request->get('typ', 0));
                 }
         }
 
@@ -384,7 +385,7 @@ class ContentController extends Controller
         $contentBind = ContentTags::query()->where('relation_id', $tagId)->where('typ', 2)->orderBy('id', 'desc')->limit(200)->get()->toArray();
         if (!empty($contentBind)) {
             $contentIds = array_column($contentBind, 'content_id');
-            $result = ContentService::getContentListView($contentIds, ($page - 1) * $limit, $limit);
+            $result = ContentService::getContentListView($contentIds, ($page - 1) * $limit, $limit, 0);
         }
 
 
