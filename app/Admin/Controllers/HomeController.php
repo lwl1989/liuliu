@@ -10,8 +10,9 @@ use Encore\Admin\Layout\Row;
 
 class HomeController extends Controller
 {
-    public function index(Content $content)
+    public function index()
     {
+         $content = new Content();
         return $content
             ->title('Dashboard')
             ->description('Description...')
