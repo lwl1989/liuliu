@@ -659,7 +659,7 @@ class UsersController extends Controller
         $tags = array_column($tags, null, 'id');
         $userInfo = UserInfo::query()->whereIn('user_id', $userIds)->get()->toArray();
         $userInfo = array_column($userInfo, null, 'user_id');
-        $relations = UserRelations::followRelation(Auth::id(), $userIds);
+        //$relations = UserRelations::followRelation(Auth::id(), $userIds);
         foreach ($coaches as &$coach) {
             $coach['tags'] = [];
             foreach ($coachTags as $coachTag) {
@@ -670,7 +670,7 @@ class UsersController extends Controller
                 }
             }
             $coach['user'] = $userInfo[$coach['user_id']];
-            $coach['followed'] = $relations[$coach['user_id']];
+            $coach['followed'] = 1;
             unset($coach);
         }
         return [
