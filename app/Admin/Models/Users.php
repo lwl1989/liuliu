@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Request;
 
 class Users extends Model
 {
+    const CREATED_AT = 'create_time';
+    const UPDATED_AT = 'update_time';
     public $table = "users";
     public function paginate()
     {
