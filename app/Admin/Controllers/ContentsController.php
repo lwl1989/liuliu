@@ -26,7 +26,7 @@ class ContentsController extends AdminController
      */
     protected function title()
     {
-        return "用户列表";
+        return "内容列表";
     }
     /**
      * Make a grid builder.
