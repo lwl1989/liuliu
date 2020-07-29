@@ -42,7 +42,10 @@ class ContentsController extends AdminController
         $grid->column('create_time', '发布时间');
         $grid->column('update_time', '更改时间');
         $grid->column('cover', '图片')->display(function ($v) {
-            return '<img src="'.$v.'" width=80 height=80>';
+            if ($v != "") {
+                return '<img src="' . $v . '" width=80 height=80>';
+            }
+            return '';
         });
         $grid->disableCreateButton();
         $grid->disableExport();
