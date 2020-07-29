@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Disable extends RowAction
 {
-    public $name = '禁用';
+    public $name = '禁用/启用';
 
     public function handle(Model $model)
     {
