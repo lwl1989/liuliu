@@ -9,6 +9,7 @@
 namespace App\Admin\Controllers;
 
 
+use App\Admin\Actions\Content\Disable;
 use App\Admin\Models\Users;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
@@ -49,6 +50,12 @@ class UsersController extends AdminController
             0 => '禁用',
             1 => '正常'
         ]);;
+        $grid->actions(function (Grid\Displayers\Actions $actions) {
+            $actions->disableEdit();
+            $actions->disableDelete();
+
+            $actions->add(new Disable());
+        });
         return $grid;
     }
 

@@ -19,7 +19,7 @@ class Disable extends RowAction
         }
         $model->save();
 
-        return $this->response()->success('Success message.')->refresh();
+        return $this->response()->success('操作成功')->refresh();
     }
 
 }
