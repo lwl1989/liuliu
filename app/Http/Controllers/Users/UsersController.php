@@ -74,17 +74,11 @@ class UsersController extends Controller
         $info = UserInfo::query()->where('user_id', $uid)->first();
         $tags = UserSubTags::query()->where('user_id', $uid)->get()->toArray();
 
-        $fansCount = 0;
-        $fans = UserCounts::query()->where('user_id', $uid)->where('typ', Common::USER_OP_BE_FOLLOW)->first(['counts']);
-        if ($fans) {
-            $fansCount = ($fans->toArray())['counts'];
-        }
+        $fansCount = UserRelations::query()->where('re_user_id', $uid)->where('status', Common::STATUS_NORMAL)->count();
 
-        $followCount = 0;
-        $follows = UserCounts::query()->where('user_id', $uid)->where('typ', Common::USER_OP_FOLLOW)->first(['counts']);
-        if ($follows) {
-            $followCount = ($follows->toArray())['counts'];
-        }
+
+        $followCount = UserRelations::query()->where('user_id', $uid)->where('status', Common::STATUS_DISABLE)->count();
+
         $isCoach = 0;
         $coach = UserCoach::query()->where('user_id', $uid)->where('status', Common::STATUS_NORMAL)->first();
         if ($coach) {
@@ -145,6 +139,7 @@ class UsersController extends Controller
      * @api               {get} /api/user/contents/{uid} 我的feed流
      * @apiGroup          用户中心
      * @apiName           我的feed流
+     * @apiParam {String} sort time|hot
      * @apiVersion        1.0.0
      *
      * @apiSuccessExample Success-Response
@@ -188,6 +183,7 @@ class UsersController extends Controller
         }
 
         $userIds = array_column($relations, 're_user_id');
+
         $contents = Content::query()
             ->whereIn('user_id', $userIds)
             ->where('status', Common::STATUS_NORMAL)
@@ -198,6 +194,12 @@ class UsersController extends Controller
         $contents = UserInfo::getUserInfoWithList($contents);
         $contents = ContentCounts::getContentsCounts($contents);
 
+        $sort = $request->query('sort');
+        if($sort != '' && $sort == 'hot') {
+            uasort($contents, function ($a, $b) {
+                return (($a['counts']['3']+$a['counts']['6']) > ($b['counts']['3']+$b['counts']['6'])) ? -1 : 1;
+            });
+        }
         return [
             'contents' => $contents
         ];
@@ -646,20 +648,19 @@ class UsersController extends Controller
         if (empty($coachIds)) {
             return ['coaches' => []];
         }
-        $coachIds = array_column($coachIds, 're_user_id');
-        $coaches = UserCoach::query()->whereIn('id', $coachIds)->where('status', Common::STATUS_NORMAL)->get()->toArray();
+        $userIds= array_column($coachIds, 're_user_id');
+        $coaches = UserCoach::query()->whereIn('user_id', $coachIds)->where('status', Common::STATUS_NORMAL)->get()->toArray();
         if (empty($coaches)) {
             return ['coaches' => []];
         }
-
-        $userIds = array_column($coaches, 'user_id');
+        $coachIds = array_column($coaches, 'id');
+        //$userIds = array_column($coaches, 'user_id');
         $coachTags = UserCoachTags::query()->whereIn('coach_id', $coachIds)->get()->toArray();
         $tagsIds = array_column($coachTags, 'tag_id');
         $tags = Tags::query()->whereIn('id', $tagsIds)->get()->toArray();
         $tags = array_column($tags, null, 'id');
         $userInfo = UserInfo::query()->whereIn('user_id', $userIds)->get()->toArray();
         $userInfo = array_column($userInfo, null, 'user_id');
-        //$relations = UserRelations::followRelation(Auth::id(), $userIds);
         foreach ($coaches as &$coach) {
             $coach['tags'] = [];
             foreach ($coachTags as $coachTag) {
@@ -883,7 +884,7 @@ class UsersController extends Controller
         }
 
         $results = UserInfo::getUserInfoWithList($results);
-        $results = uasort($results, function ($a, $b) {
+        uasort($results, function ($a, $b) {
             return ($a['time'] > $b['time']) ? -1 : 1;
         });
         return [

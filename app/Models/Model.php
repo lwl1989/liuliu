@@ -3,9 +3,12 @@
 namespace App\Models;
 
 
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 class Model extends \Illuminate\Database\Eloquent\Model implements ModelExtInterface
 {
     use ExtensionModelTrait;
+    //use SoftDeletes;
 
     const CREATED_AT = 'create_time';
     const UPDATED_AT = 'update_time';

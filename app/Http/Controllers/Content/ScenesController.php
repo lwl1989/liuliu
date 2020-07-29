@@ -157,9 +157,11 @@ class ScenesController extends Controller
     public function detail(Request $request)
     {
         $scene = Scene::query()->find($request->route('scene_id'));
-        if ($scene) {
-            $scene = $scene->toArray();
+        if (!$scene) {
+            return ['code' => ErrorConstant::DATA_ERR, 'response' => '场景数据不存在'];
         }
+
+        $scene = $scene->toArray();
         $scene = SceneReply::limitCounts([$scene], 0)[0];
 
         return [

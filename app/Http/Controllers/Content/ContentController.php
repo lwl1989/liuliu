@@ -21,6 +21,7 @@ use App\Models\Content\ContentTags;
 use App\Models\Content\Resources;
 use App\Models\RegisterUsers\UserCoach;
 use App\Models\RegisterUsers\UserCounts;
+use App\Models\RegisterUsers\UserFavorites;
 use App\Models\RegisterUsers\UserInfo;
 use App\Models\RegisterUsers\UserOpLog;
 use App\Models\RegisterUsers\UserRelations;
@@ -58,18 +59,23 @@ class ContentController extends Controller
      *          'is_coach':1,
      *          'job':'xxx',
      *          'real_name':'xxx',
-     *          'followed':'1'
+     *          'followed':'1',
+     *                    'nickname':'',
+     *                    'avatar':''
      *         },
      *      "tags":[{"id":"1","name":"ojbk"}],
      *      "topics":[{"id":"1","name":"ojbk"}],
      *      "resources":[{"id":"1","value":"httpxxxxxxx"}]
      *      "zan":"1",
      *      "zanCount":"100",
-     *      "commentCount":"101"
+     *      "commentCount":"101",
+     *                    "is_favorite":"1",
+     *                    "favoriteCount":"100"
      *   }
      */
     /**
      * @param Request $request
+     *
      * @return array
      */
     public function detail(Request $request): array
@@ -133,6 +139,13 @@ class ContentController extends Controller
             ->where('user_id', $uid)
             ->where('status', Common::STATUS_NORMAL)
             ->first();
+        $avatar = UserInfo::query()->where('user_id', $uid)->select(['avatar', 'nickname'])->first();
+        $user['avatar'] = '';
+        $user['nickname'] = '';
+        if ($avatar) {
+            $user['avatar'] = $avatar->avatar;
+            $user['nickname'] = $avatar->nickname;
+        }
         if ($relation) {
             $user['followed'] = '1';
         }
@@ -150,7 +163,16 @@ class ContentController extends Controller
             if ($exists) {
                 $zan = 1;
             }
-            $zanCount = UserZan::query()->where('typ', 1)->where('obj_id', $id)->count();
+            $zanCount = UserZan::query()->where('typ', UserZan::UserZanContent)->where('obj_id', $id)->count();
+        }
+        $favorites = 0;
+        $favoritesCount = 0;
+        if ($uid > 0) {
+            $exists = UserFavorites::query()->where('user_id', $uid)->where('typ', UserFavorites::UserFavoritesContent)->where('obj_id', $id)->first(['id']);
+            if ($exists) {
+                $favorites = 1;
+            }
+            $favoritesCount = UserFavorites::query()->where('typ', UserFavorites::UserFavoritesContent)->where('obj_id', $id)->count();
         }
         return [
             'uid' => $uid,
@@ -162,6 +184,9 @@ class ContentController extends Controller
             'zan' => $zan,
             'zanCount' => $zanCount,
             'commentCount' => $commentCount,
+            'favorites' => $favorites,
+            'is_favorite' => $favorites,
+            'favoriteCount' => $favoritesCount
         ];
     }
 
@@ -259,6 +284,7 @@ class ContentController extends Controller
      * @apiParam {String} tag_id
      * @apiParam {String} page
      * @apiParam {String} limit
+     * @apiParam {String} typ
      * @apiGroup          内容获取
      * @apiName           获取不同标签下文章内容
      *
@@ -305,7 +331,7 @@ class ContentController extends Controller
                 $contentBind = ContentTags::query()->where('relation_id', $tagId)->where('typ', 1)->orderBy('id', 'desc')->limit(200)->get()->toArray();
                 if (!empty($contentBind)) {
                     $contentIds = array_column($contentBind, 'content_id');
-                    $result = ContentService::getContentListView($contentIds, ($page - 1) * $limit, $limit);
+                    $result = ContentService::getContentListView($contentIds, ($page - 1) * $limit, $limit, $request->get('typ', 0));
                 }
         }
 
@@ -359,7 +385,7 @@ class ContentController extends Controller
         $contentBind = ContentTags::query()->where('relation_id', $tagId)->where('typ', 2)->orderBy('id', 'desc')->limit(200)->get()->toArray();
         if (!empty($contentBind)) {
             $contentIds = array_column($contentBind, 'content_id');
-            $result = ContentService::getContentListView($contentIds, ($page - 1) * $limit, $limit);
+            $result = ContentService::getContentListView($contentIds, ($page - 1) * $limit, $limit, 0);
         }
 
 
@@ -397,19 +423,19 @@ class ContentController extends Controller
      */
     /**
      * @param Request $request
+     *
      * @return array
      */
     public function recommend(Request $request): array
     {
         $type = $request->get('type', 1);
 
-        $result = Content::query()->where('typ', $type)->inRandomOrder()->take(10)->get()->toArray();
+        $result = Content::query()->where('template_id', 2)->where('typ', $type)->inRandomOrder()->take(10)->get()->toArray();
         $result = UserInfo::getUserInfoWithList($result);
         $result = ContentCounts::getContentsCounts($result);
 
         foreach ($result as &$item) {
             $item['resources'] = Resources::query()
-                ->where('template_id', 2)
                 ->where('content_id', $item['id'])
                 ->where('status', Common::STATUS_NORMAL)->get()->toArray();
             unset($item);

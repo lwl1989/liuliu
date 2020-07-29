@@ -190,6 +190,9 @@ class TopicController
             $contents = UserInfo::getUserInfoWithList($contents);
             $contents = ContentCounts::getContentsCounts($contents);
         }
+
+        $topic['user'] = UserInfo::query()->where('user_id', $topic['user_id'])->first()->toArray();
+
         return [
             'topic' => $topic,
             'contents' => $contents

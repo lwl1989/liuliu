@@ -34,8 +34,8 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
     Route::group(['prefix' => 'content'],function (){
         Route::post('comment', 'Content\CommentController@comment');
         Route::post('release', 'Content\ContentController@release');
-        Route::get('/detail','Content\ContentController@detail');
-        Route::get('/comments','Content\CommentController@all');
+        Route::get('detail','Content\ContentController@detail');
+        Route::get('comments','Content\CommentController@all');
 
         Route::get('/', 'Content\ContentController@myList');
 
@@ -61,7 +61,7 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
         Route::get('questions/{uid}', 'Users\UsersController@questions');
         Route::get('topics/{uid}', 'Users\UsersController@topics');
         Route::get('answer/{uid}', 'Users\UsersController@myAnswer');
-        Route::post('center', 'Users\UsersController@center');
+        Route::get('center', 'Users\UsersController@center');
         Route::post('follow', 'Users\UsersController@follow');
         Route::post('unfollow', 'Users\UsersController@unFollow');
         Route::get('scenes/{uid}', 'Users\UsersController@scenes');
@@ -107,5 +107,4 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
     Route::get('scenes', 'Content\ScenesController@page');
     Route::get('questions', 'Content\QuestionController@timeLine');
     Route::get('tags', 'Common\TagsController@getAll');
-
 });
