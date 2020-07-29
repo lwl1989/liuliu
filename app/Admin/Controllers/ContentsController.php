@@ -43,6 +43,7 @@ class ContentsController extends AdminController
         $grid->column('update_time', '更改时间');
         $grid->column('cover', '图片')->display(function ($v) {
             if ($v != "") {
+                $v = str_replace('http:', 'https:', $v);
                 return '<img src="' . $v . '" width=80 height=80>';
             }
             return '';
