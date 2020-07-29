@@ -62,5 +62,8 @@
 <!-- REQUIRED JS SCRIPTS -->
 {!! Admin::js() !!}
 
+<script>
+    $('.sidebar-toggle').show();
+</script>
 </body>
 </html>
