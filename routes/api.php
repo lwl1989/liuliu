@@ -55,6 +55,7 @@ Route::group(['middleware' => ['format','auth:c_api']], function () {
 
     Route::group(['prefix' => 'user'],function (){
         Route::get('follows/{uid}', 'Users\UsersController@follows');
+        Route::get('fans/{uid}', 'Users\UsersController@fans');
         Route::get('contents/{uid}', 'Users\UsersController@contents');
         Route::get('comments/{uid}', 'Users\UsersController@comments');
         Route::get('question/{uid}', 'Users\UsersController@questions');

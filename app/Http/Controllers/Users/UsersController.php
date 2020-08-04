@@ -145,6 +145,57 @@ class UsersController extends Controller
 
         return ['coaches' => $coaches];
     }
+    /**
+     * @api               {get} /api/user/follofansws/{uid} 我的粉丝列表
+     * @apiGroup          用户中心
+     * @apiName           我的粉丝列表
+     * @apiVersion        1.0.0
+     *
+     * @apiSuccessExample Success-Response
+     * [
+     *     {
+     *                  "user_id": "1",
+     *                  "nickname": "休息休息",
+     *                  "avatar": "https://xxxxxx/",
+     *    },//...
+     * ]
+     */
+    /**
+     * @param Request $request
+     *
+     * @return array
+     */
+    public function fans(Request $request): array
+    {
+        $uid = $request->route('uid');
+
+        $relations = UserRelations::query()
+            ->where('re_user_id', $uid)
+            ->where('status', Common::STATUS_NORMAL)
+            ->where('typ', 1)
+            ->get()
+            ->toArray();
+
+        if (empty($relations)) {
+            return ['coaches' => []];
+        }
+
+        $userIds = array_column($relations, 'user_id');
+        $coaches = Users::query()->select(['username', 'id', 'typ'])->whereIn('id', $userIds)->get()->toArray();
+        if(!empty($coaches)) {
+            $isCoaches = UserCoach::query()->whereIn('user_id', $userIds)->where('status', Common::STATUS_NORMAL)->get()->toArray();
+            $isCoaches = array_column($isCoaches, null, 'user_id');
+            foreach ($coaches as &$coach) {
+                $coach['is_coach'] = 0;
+                if(isset($isCoaches[$coach['user_id']])) {
+                    $coach['is_coach'] = 1;
+                }
+                unset($coach);
+            }
+        }
+
+        return ['coaches' => $coaches];
+    }
 
     /**
      * @api               {get} /api/user/contents/{uid} 我的feed流
