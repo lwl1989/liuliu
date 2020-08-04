@@ -131,6 +131,17 @@ class UsersController extends Controller
 
         $userIds = array_column($relations, 're_user_id');
         $coaches = Users::query()->select(['username', 'id', 'typ'])->whereIn('id', $userIds)->get()->toArray();
+        if(!empty($coaches)) {
+            $isCoaches = UserCoach::query()->whereIn('user_id', $userIds)->where('status', Common::STATUS_NORMAL)->get()->toArray();
+            $isCoaches = array_column($isCoaches, null, 'user_id');
+            foreach ($coaches as &$coach) {
+                $coach['is_coach'] = 0;
+                if(isset($isCoaches[$coach['user_id']])) {
+                    $coach['is_coach'] = 1;
+                }
+                unset($coach);
+            }
+        }
 
         return ['coaches' => $coaches];
     }
