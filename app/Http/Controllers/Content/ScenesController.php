@@ -172,7 +172,7 @@ class ScenesController extends Controller
 
 
     /**
-     * @api               {get} /api/scene/reply/replies/{scene_id} 获取场景意见列表
+     * @api               {get} /api/scene/replies/{scene_id} 获取场景意见列表
      *
      * @apiParam {String} page
      * @apiParam {String} limit
@@ -244,7 +244,7 @@ class ScenesController extends Controller
                 $zan = array_column($zan, 'obj_id');
                 foreach ($replies as &$reply) {
                     $reply['zan'] = 0;
-                    if (in_array($zan, $replies['id'])) {
+                    if (in_array($zan, $replies)) {
                         $reply['zan'] = '1';
                     }
                     unset($reply);

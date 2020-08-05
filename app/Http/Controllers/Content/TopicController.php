@@ -191,7 +191,12 @@ class TopicController
             $contents = ContentCounts::getContentsCounts($contents);
         }
 
-        $topic['user'] = UserInfo::query()->where('user_id', $topic['user_id'])->first()->toArray();
+        $topic['user'] = [];
+
+        $user = UserInfo::query()->where('user_id', $topic['user_id'])->first();
+        if($user) {
+            $topic['user'] = $user->toArray();
+        }
 
         return [
             'topic' => $topic,
