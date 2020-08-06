@@ -238,7 +238,7 @@ class ScenesController extends Controller
 
             if ($uid > 0) {
                 $zan = UserZan::query()->where('typ', UserZan::UserZanScene)
-                    ->whereIn('obj_id', array_column($replies, 'user_id'))
+                    ->whereIn('obj_id', array_column($replies, 'id'))
                     ->where('user_id', $uid)
                     ->select(['obj_id'])->get()->toArray();
                 $zan = array_column($zan, 'obj_id');

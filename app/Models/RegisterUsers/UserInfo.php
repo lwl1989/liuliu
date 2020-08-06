@@ -31,9 +31,12 @@ class UserInfo extends Model
         }
         $userIds = array_column($list, $userIdKey);
         $users = UserInfo::query()->whereIn('user_id', $userIds)->get()->toArray();
+        $coaches = UserCoach::query()->whereIn('user_id', $userIds)->where('status', Common::STATUS_NORMAL)->get(['id'])->toArray();
         $users = array_column($users, null, 'user_id');
+        $coaches = array_column($coaches, null, 'user_id');
         foreach ($list as &$item) {
             $item['user'] = $users[$item['user_id']];
+            $item['user']['is_coach'] = isset($coaches[$item['user_id']]) ? "1" : "0";
             unset($item);
         }
         return $list;
@@ -53,7 +56,7 @@ class UserInfo extends Model
 
         $user['is_coach'] = 0;
         $user['coach'] = new \stdClass();
-        if(!$userCoach) {
+        if (!$userCoach) {
             $user['is_coach'] = 1;
             $user['coach'] = $userCoach->toArray();
         }
