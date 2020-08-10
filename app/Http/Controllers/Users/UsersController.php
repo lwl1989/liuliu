@@ -240,6 +240,11 @@ class UsersController extends Controller
             ->get()
             ->toArray();
 
+
+        $relations[] = [
+            'user_id'   =>  $uid,
+            're_user_id'=>  $uid
+        ];
         if (empty($relations)) {
             return ['contents' => []];
         }
