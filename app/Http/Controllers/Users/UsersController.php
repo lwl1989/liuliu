@@ -245,16 +245,16 @@ class UsersController extends Controller
             'user_id'   =>  $uid,
             're_user_id'=>  $uid
         ];
-        if (empty($relations)) {
-            return ['contents' => []];
-        }
+//        if (empty($relations)) {
+//            return ['contents' => []];
+//        }
 
         $userIds = array_column($relations, 're_user_id');
 
         $contents = Content::query()
             ->whereIn('user_id', $userIds)
             ->where('status', Common::STATUS_NORMAL)
-            ->orderBy('create_time', 'desc')
+            ->orderBy('id', 'desc')
             ->get()
             ->toArray();
 
