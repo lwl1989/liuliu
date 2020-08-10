@@ -55,6 +55,7 @@ class ContentCounts extends Model
            }
         }
 
+        $list = ContentTags::getContentTagWithResult($list, 1);
         return $list;
     }
 
