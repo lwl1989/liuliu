@@ -32,7 +32,7 @@ class ContentTags extends Model
 
         $listIds = array_column($list, 'id');
 
-        $ccs = ContentTags::query()->whereIn('content_id', $listIds)->whereIn('typ', $tagType)->get()->toArray();
+        $ccs = ContentTags::query()->whereIn('content_id', $listIds)->where('typ', $tagType)->get()->toArray();
         $tagsIds = array_column($ccs, 'relation_id');
         if ($tagType == 1) {
             $tags = Tags::query()->whereIn('id', $tagsIds)->get()->toArray();
