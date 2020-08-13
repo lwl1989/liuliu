@@ -36,6 +36,7 @@ class UserCoachController extends Controller
      * @apiName           加入教练
      *
      * @apiParam {String} glory
+     * @apiParam {string} img
      * @apiParam {String} real_name
      * @apiParam {String} job
      * @apiParam {String} desc
@@ -68,7 +69,7 @@ class UserCoachController extends Controller
         }
         try {
             $params = ArrayParse::checkParamsArray(['glory', 'real_name', 'job', 'desc', 'intro',
-                'courses', 'services'], $request->input());
+                'courses', 'services','img'], $request->input());
             $params['user_id'] = $uid;
             $params['courses'] = is_array($params['courses']) ? implode(",", $params['courses']) : $params['courses'];
             $params['services'] = is_array($params['services']) ? implode(",", $params['services']) : $params['services'];

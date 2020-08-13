@@ -212,6 +212,7 @@ class TopicController
      * @apiVersion        1.0.0
      *
      * @apiParam {String} title 话题标题
+     * @apiParam {string} desc  详情
      *
      * @apiSuccessExample Success-Response
      *      HTTP/1.1 200 OK
@@ -224,7 +225,7 @@ class TopicController
      */
     public function release(Request $request): array
     {
-        $params = ArrayParse::checkParamsArray(['title'], $request->input());
+        $params = ArrayParse::checkParamsArray(['title','desc'], $request->input());
         $exists = Topics::query()->where('title', $params['title'])->first();
         if ($exists) {
             return ['code' => ErrorConstant::DATA_ERR, 'response' => '话题已存在'];
