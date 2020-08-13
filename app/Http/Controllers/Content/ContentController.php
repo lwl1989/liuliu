@@ -328,7 +328,7 @@ class ContentController extends Controller
                 break;
             default:
                 //todo:先期每个条目最多200条，没那么多人划那么多条，按发布时间逆序即可
-                $contentBind = ContentTags::query()->where('relation_id', $tagId)->where('typ', 1)->orderBy('id', 'desc')->limit(200)->get()->toArray();
+                $contentBind = ContentTags::query()->where('relation_id', $tagId)->where('typ', 1)->orderBy('content_id', 'desc')->get()->toArray();
                 if (!empty($contentBind)) {
                     $contentIds = array_column($contentBind, 'content_id');
                     $result = ContentService::getContentListView($contentIds, ($page - 1) * $limit, $limit, $request->get('typ', 0));
@@ -382,7 +382,7 @@ class ContentController extends Controller
         $result = [];
 
         //todo:先期每个条目最多200条，没那么多人划那么多条，按发布时间逆序即可
-        $contentBind = ContentTags::query()->where('relation_id', $tagId)->where('typ', 2)->orderBy('id', 'desc')->limit(200)->get()->toArray();
+        $contentBind = ContentTags::query()->where('relation_id', $tagId)->where('typ', 2)->orderBy('content_id', 'desc')->get()->toArray();
         if (!empty($contentBind)) {
             $contentIds = array_column($contentBind, 'content_id');
             $result = ContentService::getContentListView($contentIds, ($page - 1) * $limit, $limit, 0);

@@ -13,7 +13,11 @@ use App\Exceptions\ErrorConstant;
 use App\Http\Controllers\Controller;
 use App\Library\Constant\Common;
 use App\Models\Content\Content;
+use App\Models\Content\ContentComment;
 use App\Models\Content\ContentCounts;
+use App\Models\Content\Scene;
+use App\Models\Question\QuestionReply;
+use App\Models\Question\Questions;
 use App\Models\RegisterUsers\UserCounts;
 use App\Models\RegisterUsers\UserNotice;
 use App\Models\RegisterUsers\UserOpLog;
@@ -48,10 +52,43 @@ class ZanController extends Controller
         if (!$cid) {
             return ['code' => ErrorConstant::PARAMS_ERROR, 'response' => 'id错误'];
         }
-        $content = Content::query()->where('id', $cid)->first();
+
+        switch ($typ) {
+            case UserZan::UserZanContent:
+                $content = Content::query()->where('id', $cid)->first();
+                if (!$content) {
+                    return ['code' => ErrorConstant::PARAMS_ERROR, 'response' => 'id错误'];
+                }
+                break;
+            case UserZan::UserZanAnswer:
+                $content = QuestionReply::query()->where('id', $cid)->first();
+                if (!$content) {
+                    return ['code' => ErrorConstant::PARAMS_ERROR, 'response' => 'id错误'];
+                }
+                break;
+            case UserZan::UserZanComment:
+                $content = ContentComment::query()->where('id', $cid)->first();
+                if (!$content) {
+                    return ['code' => ErrorConstant::PARAMS_ERROR, 'response' => 'id错误'];
+                }
+                break;
+            case UserZan::UserZanQuestion:
+                $content = Questions::query()->where('id', $cid)->first();
+                if (!$content) {
+                    return ['code' => ErrorConstant::PARAMS_ERROR, 'response' => 'id错误'];
+                }
+                break;
+            case UserZan::UserZanScene:
+                $content = Scene::query()->where('id', $cid)->first();
+                break;
+            default:
+                $content = false;
+        }
+
         if (!$content) {
             return ['code' => ErrorConstant::PARAMS_ERROR, 'response' => 'id错误'];
         }
+
         DB::beginTransaction();
         $uid = Auth::id();
         $exists = UserZan::query()->where('user_id', $uid)->where('typ', $typ)->where('obj_id', $cid)->first();
