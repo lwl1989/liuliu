@@ -14,6 +14,7 @@ class ContentService
     public static function getContentListView($ids, $offset, $limit, $typ): array
     {
         $c = count($ids);
+
         if($c < $offset) {
             return [];
         }
@@ -23,10 +24,12 @@ class ContentService
             $result = Content::query()
                 ->whereIn('id', $ids)
                 ->where('typ', $typ)
+                ->orderBy('id','desc')
                 ->get()->toArray();
         }else{
             $result = Content::query()
                 ->whereIn('id', $ids)
+                ->orderBy('id','desc')
                 ->get()->toArray();
         }
         //        echo '<pre>';

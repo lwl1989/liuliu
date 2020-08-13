@@ -16,6 +16,7 @@ Route::group(['middleware' => ['format']], function () {
     Route::post('webhook','Controller@webHook');
     Route::get('wx/login','Auth\WxController@login');
     Route::get('wx/token','Auth\WxController@getToken');
+    //Route::get('userTag','Common\TagsController@getList');
 });
 
 Route::group(['middleware' => ['format','auth:c_api']], function () {
