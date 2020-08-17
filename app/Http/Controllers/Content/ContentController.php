@@ -211,10 +211,13 @@ class ContentController extends Controller
     public function release(Request $request): array
     {
         $uid = Auth::id();
+        $params = ArrayParse::checkParamsArray(['title', 'typ', 'content', 'cover', 'template_id'], $request->input());
+        $params['user_id'] = $uid;
+        if($params['template_id'] < 1 || $params['title'] == '' || $params['typ'] < 1) {
+            return ['code' => ErrorConstant::PARAMS_ERROR, 'response' => '参数错误'];
+        }
         DB::beginTransaction();
         try {
-            $params = ArrayParse::checkParamsArray(['title', 'typ', 'content', 'cover', 'template_id'], $request->input());
-            $params['user_id'] = $uid;
             $cid = Content::query()->insertGetId($params);
 
             $tagParams = ArrayParse::checkParamsArray(['tag_ids'], $request->input());
