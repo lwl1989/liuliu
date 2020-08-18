@@ -16,6 +16,7 @@ use App\Models\Content\Content;
 use App\Models\Content\ContentComment;
 use App\Models\Content\ContentCounts;
 use App\Models\Content\Scene;
+use App\Models\Content\SceneReply;
 use App\Models\Question\QuestionReply;
 use App\Models\Question\Questions;
 use App\Models\RegisterUsers\UserCounts;
@@ -79,7 +80,7 @@ class ZanController extends Controller
                 }
                 break;
             case UserZan::UserZanScene:
-                $content = Scene::query()->where('id', $cid)->first();
+                $content = SceneReply::query()->where('id', $cid)->first();
                 break;
             default:
                 $content = false;
