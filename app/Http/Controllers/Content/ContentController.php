@@ -433,7 +433,7 @@ class ContentController extends Controller
     {
         $type = $request->get('type', 1);
 
-        $result = Content::query()->where('template_id', 2)->where('typ', $type)->inRandomOrder()->orderBy('id','desc')->take(10)->get()->toArray();
+        $result = Content::query()->where('template_id', 2)->where('typ', $type)->orderBy('id','desc')->take(10)->get()->toArray();
         $result = UserInfo::getUserInfoWithList($result);
         $result = ContentCounts::getContentsCounts($result);
 
