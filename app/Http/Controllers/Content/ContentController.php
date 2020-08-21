@@ -431,7 +431,8 @@ class ContentController extends Controller
      */
     public function recommend(Request $request): array
     {
-        $type = $request->get('type', 1);
+        $type = $request->get('typ', 1);
+
 
         $result = Content::query()->where('template_id', 2)->where('typ', $type)->orderBy('id','desc')->take(10)->get()->toArray();
         $result = UserInfo::getUserInfoWithList($result);
