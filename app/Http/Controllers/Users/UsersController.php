@@ -69,7 +69,10 @@ class UsersController extends Controller
      */
     public function center(Request $request): array
     {
-        $uid = Auth::id();
+        $uid = $request->get('uid', false);
+        if(!$uid) {
+            $uid = Auth::id();
+        }
 
         $info = UserInfo::query()->where('user_id', $uid)->first();
         $tags = UserSubTags::query()->where('user_id', $uid)->get()->toArray();
