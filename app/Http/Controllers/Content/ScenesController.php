@@ -166,7 +166,7 @@ class ScenesController extends Controller
 
         return [
             'scene' => $scene,
-            'user' => UserInfo::query()->find($scene['user_id'])->toArray()
+            'user' => UserInfo::query()->where('user_id',$scene['user_id'])->first()->toArray()
         ];
     }
 
