@@ -141,7 +141,7 @@ class UsersController extends Controller
                 if(isset($isCoaches[$coach['id']])) {
                     $coach['is_coach'] = 1;
                 }
-
+                $coach['followed'] = 1;
                 if(isset($infos[$coach['id']])) {
                     $coach  = array_merge($infos[$coach['id']], $coach);
                 }
@@ -188,6 +188,13 @@ class UsersController extends Controller
         }
 
         $userIds = array_column($relations, 'user_id');
+        $relations = UserRelations::query()
+            ->where('user_id', $uid)
+            ->whereIn('re_user_id', $userIds)
+            ->where('status', Common::STATUS_NORMAL)
+            ->where('typ', 1)
+            ->get()
+            ->toArray();
         $coaches = Users::query()->select(['username', 'id', 'typ'])->whereIn('id', $userIds)->get()->toArray();
         if(!empty($coaches)) {
             $isCoaches = UserCoach::query()->whereIn('user_id', $userIds)->where('status', Common::STATUS_NORMAL)->get()->toArray();
@@ -196,6 +203,12 @@ class UsersController extends Controller
                 $coach['is_coach'] = 0;
                 if(isset($isCoaches[$coach['user_id']])) {
                     $coach['is_coach'] = 1;
+                }
+                foreach ($relations as $relation) {
+                    if($relation['re_user_id'] == $coach['user_id']) {
+                        $coach['followed'] = 1;
+                        break;
+                    }
                 }
                 unset($coach);
             }
