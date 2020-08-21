@@ -205,7 +205,7 @@ class UsersController extends Controller
                     $coach['is_coach'] = 1;
                 }
                 foreach ($relations as $relation) {
-                    if($relation['re_user_id'] == $coach['user_id']) {
+                    if($relation['re_user_id'] == $coach['id']) {
                         $coach['followed'] = 1;
                         break;
                     }
