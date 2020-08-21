@@ -201,7 +201,7 @@ class UsersController extends Controller
             $isCoaches = array_column($isCoaches, null, 'user_id');
             foreach ($coaches as &$coach) {
                 $coach['is_coach'] = 0;
-                if(isset($isCoaches[$coach['user_id']])) {
+                if(isset($isCoaches[$coach['id']])) {
                     $coach['is_coach'] = 1;
                 }
                 foreach ($relations as $relation) {
