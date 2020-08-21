@@ -143,11 +143,13 @@ class UsersController extends Controller
                 $coach['is_coach'] = 0;
                 if(isset($isCoaches[$coach['id']])) {
                     $coach['is_coach'] = 1;
+                    $coach  = array_merge($isCoaches[$coach['id']], $coach);
                 }
                 $coach['followed'] = 1;
                 if(isset($infos[$coach['id']])) {
                     $coach  = array_merge($infos[$coach['id']], $coach);
                 }
+
 
                 unset($coach);
             }
@@ -208,6 +210,7 @@ class UsersController extends Controller
                 $coach['is_coach'] = 0;
                 if(isset($isCoaches[$coach['id']])) {
                     $coach['is_coach'] = 1;
+                    $coach  = array_merge($isCoaches[$coach['id']], $coach);
                 }
                 if(isset($infos[$coach['id']])) {
                     $coach  = array_merge($infos[$coach['id']], $coach);
