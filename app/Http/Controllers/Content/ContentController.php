@@ -139,7 +139,7 @@ class ContentController extends Controller
             ->where('user_id', $uid)
             ->where('status', Common::STATUS_NORMAL)
             ->first();
-        $avatar = UserInfo::query()->where('user_id', $uid)->select(['avatar', 'nickname'])->first();
+        $avatar = UserInfo::query()->where('user_id', $content['user_id'])->select(['avatar', 'nickname'])->first();
         $user['avatar'] = '';
         $user['nickname'] = '';
         if ($avatar) {
