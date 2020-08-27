@@ -73,7 +73,8 @@ class UserCoachController extends Controller
             $params['user_id'] = $uid;
             $params['courses'] = is_array($params['courses']) ? implode(",", $params['courses']) : $params['courses'];
             $params['services'] = is_array($params['services']) ? implode(",", $params['services']) : $params['services'];
-            $params['status'] = 3; // 待审核
+//            $params['status'] = 3; // todo:待审核
+            $params['status'] = 1;
             $ucId = UserCoach::query()->insertGetId($params);
 
             $tagParams = ArrayParse::arrayCopy(['tag_ids'], $request->input());
