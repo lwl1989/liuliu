@@ -4,6 +4,7 @@
 namespace App\Services;
 
 
+use App\Library\Constant\Common;
 use App\Models\Content\Content;
 use App\Models\Content\ContentCounts;
 use App\Models\RegisterUsers\UserInfo;
@@ -24,11 +25,13 @@ class ContentService
             $result = Content::query()
                 ->whereIn('id', $ids)
                 ->where('typ', $typ)
+                ->where('status', Common::STATUS_NORMAL)
                 ->orderBy('id','desc')
                 ->get()->toArray();
         }else{
             $result = Content::query()
                 ->whereIn('id', $ids)
+                ->where('status', Common::STATUS_NORMAL)
                 ->orderBy('id','desc')
                 ->get()->toArray();
         }
