@@ -20,18 +20,22 @@ class ContentService
             return [];
         }
 
-        $ids = array_slice($ids, $offset, $limit);
+     //   $ids = array_slice($ids, $offset, $limit);
         if($typ != 0) {
             $result = Content::query()
                 ->whereIn('id', $ids)
                 ->where('typ', $typ)
                 ->where('status', Common::STATUS_NORMAL)
+                ->limit($limit)
+                ->offset($offset)
                 ->orderBy('id','desc')
                 ->get()->toArray();
         }else{
             $result = Content::query()
                 ->whereIn('id', $ids)
                 ->where('status', Common::STATUS_NORMAL)
+                ->limit($limit)
+                ->offset($offset)
                 ->orderBy('id','desc')
                 ->get()->toArray();
         }

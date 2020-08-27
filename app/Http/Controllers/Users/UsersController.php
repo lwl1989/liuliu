@@ -545,7 +545,7 @@ class UsersController extends Controller
         if (!empty($comment)) {
             $contentIds = array_column($comment, 'content_id');
 
-            $contents = Content::query()->whereIn('id', $contentIds)->get()->toArray();
+            $contents = Content::query()->whereIn('id', $contentIds)->where('status', Common::STATUS_NORMAL)->get()->toArray();
             $contents = ContentCounts::getContentsCounts($contents);
             $contents = UserInfo::getUserInfoWithList($contents);
             $contents = array_column($contents, null, 'id');
@@ -897,7 +897,7 @@ class UsersController extends Controller
 
         $results = [];
         if (!empty($contentIds)) {
-            $contents = Content::query()->whereIn('id', $contentIds)->get()->toArray();
+            $contents = Content::query()->whereIn('id', $contentIds)->where('status', Common::STATUS_NORMAL)->get()->toArray();
             foreach ($contents as &$content) {
                 foreach ($notices as $notice) {
                     if ($notice['obj_id'] == $contents['id'] and $notice['typ'] == Common::CONTENT_CONTENT) {
