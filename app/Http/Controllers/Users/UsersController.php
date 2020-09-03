@@ -79,10 +79,7 @@ class UsersController extends Controller
             return ['code' => ErrorConstant::DATA_ERR, 'response' => '此账户不存在'];
         }
         $info = $info->toArray();
-        $coach = UserCoach::query()->where('user_id', $uid)->first();
-        if($coach) {
-            $info = array_merge($info, $coach->toArray());
-        }
+
         $tags = UserSubTags::query()->where('user_id', $uid)->get()->toArray();
 
         $fansCount = UserRelations::query()->where('re_user_id', $uid)->where('status', Common::STATUS_NORMAL)->count();
@@ -94,6 +91,10 @@ class UsersController extends Controller
         $coach = UserCoach::query()->where('user_id', $uid)->where('status', Common::STATUS_NORMAL)->first();
         if ($coach) {
             $isCoach = 1;
+            $coach = UserCoach::query()->where('user_id', $uid)->first();
+            if($coach) {
+                $info = array_merge($info, $coach->toArray());
+            }
         }
         return [
             'user' => $info,
